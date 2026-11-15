@@ -1,0 +1,17 @@
+{
+  "name": "Estudio — Graba tus pistas como en un estudio",
+  "short_name": "Estudio",
+  "description": "Estudio de grabación multipista: graba tomas encima de una base, edita, mezcla con efectos y exporta en WAV. By Anggelo Berdejo.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#f7f0e2",
+  "background_color": "#f7f0e2",
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
