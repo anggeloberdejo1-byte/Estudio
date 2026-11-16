@@ -430,7 +430,7 @@
   .dlg-estudio .settings-section-title { color: var(--e-tenue); }
   .dlg-estudio .boton { background: var(--e-panel-2); color: var(--e-texto); border-color: var(--e-borde); }
   .comp-presets { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
-  .comp-mandos { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; justify-items: center; padding: 14px 8px; border-radius: 14px; background: var(--e-pozo); box-shadow: inset 0 0 0 1px var(--e-borde); }
+  .comp-mandos { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; justify-items: center; padding: 14px 8px; border-radius: 14px; background: var(--e-pozo); box-shadow: inset 0 0 0 1px var(--e-borde); }
   .comp-mandos .e-mando-txt { white-space: nowrap; color: var(--e-texto); }
   .comp-mando { display: flex; flex-direction: column; align-items: center; gap: 2px; }
   .comp-nombre { font-size: 11.5px; font-weight: 600; color: var(--e-tenue); }
@@ -438,15 +438,22 @@
   .comp-reduc-barra { flex: 1; height: 10px; border-radius: 5px; background: var(--e-pozo); box-shadow: inset 0 0 0 1px var(--e-borde); overflow: hidden; display: flex; justify-content: flex-end; }
   .comp-reduc-barra i { display: block; height: 100%; width: 0; background: #e0a84a; transition: width .06s linear; }
   .comp-reduc .num { min-width: 58px; text-align: right; font-family: var(--mono); color: var(--e-texto); }
+  .comp-botones { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+  .dlg-estudio .boton[aria-pressed="true"] { background: color-mix(in srgb, #e0a84a 22%, var(--e-panel)); border-color: #e0a84a; color: #e0a84a; }
   .comp-ayuda { font-size: 13px; line-height: 1.45; color: var(--e-tenue); margin: 10px 0 14px; }
   .comp-ayuda b { color: var(--e-texto); }
   .e-comp-chip { min-height: 22px; padding: 0 8px; font-size: 10.5px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .e-fx-col { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
-  .e-ent-patron { grid-column: 1 / -1; border-top: 1px solid var(--e-borde); padding-top: 14px; }
-  .e-patrones { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin: 8px 0; }
-  .e-patron { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 4px; border-radius: 12px; cursor: pointer; background: var(--e-panel); border: 1px solid var(--e-borde); color: var(--e-tenue); font: 600 11.5px var(--fuente); }
-  .e-patron svg { width: 34px; height: 34px; }
-  .e-patron[aria-pressed="true"] { color: var(--e-acento); border-color: color-mix(in srgb, var(--e-acento) 55%, transparent); background: color-mix(in srgb, var(--e-acento) 12%, var(--e-panel)); }
+  .e-ent-puerta { grid-column: 1 / -1; border-top: 1px solid var(--e-borde); padding-top: 14px; display: grid; gap: 10px; }
+  .e-puerta-cabeza { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .e-puerta-cabeza .e-ent-titulo { margin-right: auto !important; }
+  .e-puerta-led { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--e-tenue); min-width: 70px; }
+  .e-puerta-led i { width: 10px; height: 10px; border-radius: 50%; background: color-mix(in srgb, var(--e-texto) 18%, transparent); }
+  .e-puerta-led.abierta i { background: #5fb27f; box-shadow: 0 0 8px #5fb27f; }
+  .e-puerta-led.cerrada i { background: #e2604a; }
+  .e-puerta-mandos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; justify-items: center; padding: 12px 8px; border-radius: 14px; background: var(--e-pozo); box-shadow: inset 0 0 0 1px var(--e-borde); }
+  .e-puerta-mandos .e-mando { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .e-chip:disabled { opacity: .6; cursor: default; }
   .e-patron-txt { font-size: 12.5px; line-height: 1.45; color: var(--e-tenue); margin: 0; }
   .e-patron-txt b { color: var(--e-texto); }
   @media (max-width: 520px) { .comp-mandos { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 14px; } }
@@ -967,7 +974,11 @@
       <span class="num" id="compReducTxt">0.0 dB</span>
     </div>
     <p class="comp-ayuda" id="compAyuda"></p>
-    <div class="fila-botones"><button class="boton" id="compApagar" type="button" data-i18n="compApagar">Apagar el compresor</button></div>
+    <div class="fila-botones comp-botones">
+      <button class="boton" id="compAB" type="button" aria-pressed="false">A/B</button>
+      <button class="boton" id="compAuto" type="button" data-i18n="compAuto">Make-up automático</button>
+      <button class="boton" id="compApagar" type="button" data-i18n="compApagar">Apagar el compresor</button>
+    </div>
   </div>
 </dialog>
 
@@ -1007,6 +1018,51 @@ class Grabador extends AudioWorkletProcessor {
   }
 }
 registerProcessor('grabador', Grabador);
+
+// Compuerta de ruido: deja pasar el sonido solo cuando tocas o cantas; en los silencios baja el ruido del cuarto
+class Compuerta extends AudioWorkletProcessor {
+  static get parameterDescriptors() {
+    return [
+      { name: 'activa', defaultValue: 0, minValue: 0, maxValue: 1, automationRate: 'k-rate' },
+      { name: 'umbral', defaultValue: -45, minValue: -90, maxValue: 0, automationRate: 'k-rate' },
+      { name: 'rango', defaultValue: -40, minValue: -90, maxValue: 0, automationRate: 'k-rate' },
+      { name: 'ataque', defaultValue: 1, minValue: 0.05, maxValue: 50, automationRate: 'k-rate' },
+      { name: 'mantener', defaultValue: 80, minValue: 0, maxValue: 1000, automationRate: 'k-rate' },
+      { name: 'lib', defaultValue: 150, minValue: 5, maxValue: 2000, automationRate: 'k-rate' },
+    ];
+  }
+  constructor() { super(); this.env = 0; this.g = 1; this.espera = 0; this.abierta = true; this.cuenta = 0; this.pico = 0; }
+  process(inputs, outputs, p) {
+    const ent = inputs[0], sal = outputs[0];
+    if (!ent || !ent.length) return true;
+    const n = ent[0].length, sr = sampleRate;
+    if (p.activa[0] < 0.5) {
+      for (let c = 0; c < sal.length; c++) sal[c].set(ent[Math.min(c, ent.length - 1)]);
+      this.g = 1; this.abierta = true;
+    } else {
+      const abrir = Math.pow(10, p.umbral[0] / 20), cerrar = abrir * 0.63;   // 4 dB de histéresis: no tartamudea
+      const piso = Math.pow(10, p.rango[0] / 20);
+      const cAt = Math.exp(-1 / (sr * p.ataque[0] / 1000)), cLib = Math.exp(-1 / (sr * p.lib[0] / 1000));
+      const cEnv = Math.exp(-1 / (sr * 0.01)), mantener = sr * p.mantener[0] / 1000;
+      for (let i = 0; i < n; i++) {
+        let x = 0;
+        for (let c = 0; c < ent.length; c++) { const v = Math.abs(ent[c][i]); if (v > x) x = v; }
+        this.env = x > this.env ? x : this.env * cEnv;
+        if (this.env > abrir) { this.abierta = true; this.espera = mantener; }
+        else if (this.env < cerrar) { if (this.espera > 0) this.espera--; else this.abierta = false; }
+        const meta = this.abierta ? 1 : piso;
+        const k = meta > this.g ? cAt : cLib;
+        this.g = meta + (this.g - meta) * k;
+        for (let c = 0; c < sal.length; c++) sal[c][i] = ent[Math.min(c, ent.length - 1)][i] * this.g;
+      }
+    }
+    // Cada ~60 ms avisa si está abierta (para la lucecita)
+    this.cuenta += n;
+    if (this.cuenta > sr * 0.06) { this.cuenta = 0; this.port.postMessage(this.g > 0.5 ? 1 : 0); }
+    return true;
+  }
+}
+registerProcessor('compuerta', Compuerta);
 </script>
 
 <script>
@@ -1042,7 +1098,7 @@ const TEXTOS = {
     ent1: 'Ent. 1', ent2: 'Ent. 2', entMezcla: '1 + 2', entEstereo: 'Estéreo', masOpciones: 'Más opciones',
     fxEq: 'EQ', fxGraves: 'Graves', fxMedios: 'Medios', fxAgudos: 'Agudos', fxDinamica: 'Dinámica', fxComp: 'Compresor', fxApagado: 'Apagado', fxEnvios: 'Envíos', fxRetornos: 'Retornos', fxReverb: 'Reverb', fxDelay: 'Delay',
     fxHpf: 'Corte de graves', fxHpfCorto: 'Corte 80', fxNotaAyuda: 'Figura del delay (sigue el tempo). Tócalo para cambiarla.', limitador: 'Limitador', limitadorAyuda: 'Evita que la mezcla pase de 0 dB',
-    entGanancia: 'Ganancia', entEq: 'Ecualizador', entVolumen: 'Me escucho', entGrabarCon: 'La toma se graba', entConEfectos: 'Con EQ y compresor', entSinEfectos: 'Tal cual entra',
+    entGanancia: 'Ganancia', entEq: 'Ecualizador', entVolumen: 'Me escucho', entGrabarCon: 'La toma se graba', entConEfectos: 'Con compuerta, EQ y compresor', entSinEfectos: 'Tal cual entra',
     entNotaRev: 'La reverb es solo para escucharte; no se graba.', afinador: 'Afinador', afSinSenal: 'Toca una nota',
     eqP_plano: 'Plano', eqP_vozClara: 'Voz clara', eqP_calida: 'Cálida', eqP_brillo: 'Brillo', eqP_menosGraves: 'Menos graves', eqP_radio: 'Radio',
     consejoT: 'Usa audífonos al grabar.', consejoTxt: 'Así el micrófono no capta la base. Al armar una pista (R) te escuchas solo; el botón 🎧 de arriba (tecla I) lo apaga. Si tu micrófono o interfaz tiene salida de audífonos, conéctalos ahí: te escuchas sin retraso.',
@@ -1067,12 +1123,18 @@ const TEXTOS = {
     deshecho: 'Deshecho', rehecho: 'Rehecho', nadaDeshacer: 'No hay nada que deshacer', cortado: 'Clip cortado', normalizado: 'Clip normalizado ({d} dB)',
     sinEspacio: 'No hay espacio para guardar. Libera espacio o borra proyectos viejos.', errorT: 'Error', clicDerecho: 'Clic derecho (o mantener presionado) en un clip para más opciones',
     sinSoporte: 'Este navegador no puede grabar audio. Usa Chrome, Edge o Safari recientes.',
+    compRodilla: 'Knee', compDura: 'Dura', compSuaveR: 'Suave', compLibRapida: 'rápida (menos de 100 ms). Suelta enseguida; si es muy rápida, el volumen "bombea".', compLibMedia: 'media (100–400 ms). Pareja y natural para casi todo.', compLibLenta: 'lenta (más de 400 ms). Suave y larga; cuidado que no se monte sobre la siguiente frase o golpe.',
+    compABcon: 'A/B: escuchar sin compresor', compABsin: 'A/B: estás oyendo SIN compresor', compAuto: 'Make-up automático', compAutoListo: 'Make-up: +{d} dB (lo que el compresor estaba bajando)',
+    puertaT: 'Compuerta de ruido: que no se metan sonidos', puertaPrendida: 'Prendida', puertaApagada: 'Apagada', puertaMedir: 'Medir el ruido', puertaMidiendo: 'Silencio… midiendo',
+    puertaMedida: 'Ruido del cuarto: {r} dB. Umbral en {u} dB y compuerta prendida.', puertaRango: 'Cuánto baja', puertaMantener: 'Mantener', puertaAbierta: 'Abierta', puertaCerrada: 'Cerrada',
+    puertaAyuda: 'Cuando tocas o cantas la luz se pone verde y pasa todo. En los silencios se cierra y baja el ruido del cuarto (aire, ventilador, la calle). Toca «Medir el ruido» en silencio y se ajusta sola. <b>Mantener</b> la deja abierta un poco más para no cortar finales de nota; <b>Liberación</b> es qué tan suave se cierra.',
+    patronCorto: 'En el Blue Yeti usa el patrón <b>cardioide</b> (el corazón, en la perilla de atrás): capta de frente y rechaza los lados.',
     compPresetsT: 'Presets (como en Pro Tools)', compReducT: 'Cuánto aprieta', compApagar: 'Apagar el compresor', compPersonal: 'Personal', compAjustar: 'Ajustar', compAbrir: 'Abrir el compresor', entCorto: 'Entrada (micrófono)',
     compUmbral: 'Umbral', compRatio: 'Proporción', compAtaque: 'Ataque', compLib: 'Liberación', compGan: 'Ganancia',
-    compAtaqueLento: 'lento. Deja pasar el golpe antes de apretar: la percusión suena con punch y lo de después queda parejo.',
-    compAtaqueMedio: 'medio. Natural para voz y la mayoría de instrumentos.',
-    compAtaqueRapido: 'rápido. Agarra los picos al instante: controla golpes muy fuertes, pero puede quitarle punch.',
-    compAyuda: '<b>Umbral:</b> desde qué volumen empieza a apretar (más abajo = aprieta más). <b>Proporción:</b> qué tan fuerte aprieta (2:1 suave, 8:1 o más casi limita). <b>Liberación:</b> cuánto tarda en soltar. <b>Ganancia:</b> sube el volumen que se perdió.',
+    compAtaqueLento: 'lento (10–100 ms). Deja pasar el golpe antes de apretar: la percusión suena con punch y lo de después queda parejo.',
+    compAtaqueMedio: 'medio (1–10 ms). Controla los picos pero deja algo de golpe; natural para voz y la mayoría de instrumentos.',
+    compAtaqueRapido: 'rápido (0.1–1 ms). Agarra los picos al instante: controla golpes muy fuertes, pero puede quitarle punch.',
+    compAyuda: '<b>Umbral:</b> desde qué volumen empieza a apretar (más abajo = aprieta más). <b>Proporción:</b> qué tan fuerte aprieta (2:1 o 3:1 suave, 6:1 o más fuerte). <b>Knee:</b> dura entra de golpe, suave entra de a poco y suena más musical. <b>Ganancia (make-up):</b> sube lo mismo que bajó el medidor. Usa A/B para comparar y no te pases: si aprieta siempre más de 6–8 dB, se aplasta.',
     cp_suave: 'Suave', cp_voz: 'Voz', cp_vozFuerte: 'Voz al frente', cp_percusion: 'Percusión con punch', cp_picos: 'Controlar golpes', cp_bajo: 'Bajo', cp_guitarra: 'Guitarra', cp_pegamento: 'Pegamento (mezcla)', cp_limitador: 'Limitador',
     patronT: 'Patrón de tu micrófono', pat_cardioide: 'Cardioide', pat_omni: 'Omni', pat_bidireccional: 'Bidireccional', pat_estereo: 'Estéreo',
     patTxt_cardioide: 'capta lo que está al frente y rechaza los lados y atrás. El mejor para grabar tu voz, un instrumento o tu percusión en un cuarto sin tratar.',
@@ -1120,7 +1182,7 @@ const TEXTOS = {
     ent1: 'In 1', ent2: 'In 2', entMezcla: '1 + 2', entEstereo: 'Stereo', masOpciones: 'More options',
     fxEq: 'EQ', fxGraves: 'Low', fxMedios: 'Mid', fxAgudos: 'High', fxDinamica: 'Dynamics', fxComp: 'Compressor', fxApagado: 'Off', fxEnvios: 'Sends', fxRetornos: 'Returns', fxReverb: 'Reverb', fxDelay: 'Delay',
     fxHpf: 'Low cut', fxHpfCorto: 'Cut 80', fxNotaAyuda: 'Delay note value (follows the tempo). Tap to change it.', limitador: 'Limiter', limitadorAyuda: 'Keeps the mix from going over 0 dB',
-    entGanancia: 'Gain', entEq: 'Equalizer', entVolumen: 'Hear me', entGrabarCon: 'The take is recorded', entConEfectos: 'With EQ and compressor', entSinEfectos: 'Dry',
+    entGanancia: 'Gain', entEq: 'Equalizer', entVolumen: 'Hear me', entGrabarCon: 'The take is recorded', entConEfectos: 'With gate, EQ and compressor', entSinEfectos: 'Dry',
     entNotaRev: 'Reverb is only for hearing yourself; it isn’t recorded.', afinador: 'Tuner', afSinSenal: 'Play a note',
     eqP_plano: 'Flat', eqP_vozClara: 'Clear voice', eqP_calida: 'Warm', eqP_brillo: 'Bright', eqP_menosGraves: 'Less bass', eqP_radio: 'Radio',
     consejoT: 'Use headphones when recording.', consejoTxt: 'That way the mic doesn’t pick up the backing track. When you arm a track (R) you hear yourself; the 🎧 button up top (key I) turns it off. If your mic or interface has a headphone output, plug them in there: no delay at all.',
@@ -1145,12 +1207,18 @@ const TEXTOS = {
     deshecho: 'Undone', rehecho: 'Redone', nadaDeshacer: 'Nothing to undo', cortado: 'Clip split', normalizado: 'Clip normalized ({d} dB)',
     sinEspacio: 'There’s no room to save. Free up space or delete old projects.', errorT: 'Error', clicDerecho: 'Right-click (or long-press) a clip for more options',
     sinSoporte: 'This browser can’t record audio. Use a recent Chrome, Edge or Safari.',
+    compRodilla: 'Knee', compDura: 'Hard', compSuaveR: 'Soft', compLibRapida: 'fast (under 100 ms). Lets go right away; too fast and the volume "pumps".', compLibMedia: 'medium (100–400 ms). Even and natural for most things.', compLibLenta: 'slow (over 400 ms). Smooth and long; make sure it doesn’t spill into the next phrase or hit.',
+    compABcon: 'A/B: hear without compressor', compABsin: 'A/B: you’re hearing it WITHOUT compressor', compAuto: 'Auto make-up', compAutoListo: 'Make-up: +{d} dB (what the compressor was taking away)',
+    puertaT: 'Noise gate: keep room sounds out', puertaPrendida: 'On', puertaApagada: 'Off', puertaMedir: 'Measure the noise', puertaMidiendo: 'Quiet… measuring',
+    puertaMedida: 'Room noise: {r} dB. Threshold set to {u} dB and gate turned on.', puertaRango: 'Range', puertaMantener: 'Hold', puertaAbierta: 'Open', puertaCerrada: 'Closed',
+    puertaAyuda: 'When you play or sing the light turns green and everything passes. In the gaps it closes and lowers the room noise (air, fan, street). Press “Measure the noise” while quiet and it sets itself. <b>Hold</b> keeps it open a bit longer so note endings aren’t cut; <b>Release</b> is how gently it closes.',
+    patronCorto: 'On the Blue Yeti use the <b>cardioid</b> pattern (the heart, on the back knob): it picks up the front and rejects the sides.',
     compPresetsT: 'Presets (like in Pro Tools)', compReducT: 'Gain reduction', compApagar: 'Turn the compressor off', compPersonal: 'Custom', compAjustar: 'Adjust', compAbrir: 'Open the compressor', entCorto: 'Input (microphone)',
     compUmbral: 'Threshold', compRatio: 'Ratio', compAtaque: 'Attack', compLib: 'Release', compGan: 'Gain',
-    compAtaqueLento: 'slow. Lets the hit through before clamping down: percussion keeps its punch and the rest stays even.',
-    compAtaqueMedio: 'medium. Natural for vocals and most instruments.',
-    compAtaqueRapido: 'fast. Grabs peaks instantly: tames very loud hits, but can take away punch.',
-    compAyuda: '<b>Threshold:</b> the level where it starts working (lower = more compression). <b>Ratio:</b> how hard it squeezes (2:1 gentle, 8:1 or more is almost limiting). <b>Release:</b> how fast it lets go. <b>Gain:</b> brings back the lost volume.',
+    compAtaqueLento: 'slow (10–100 ms). Lets the hit through before clamping down: percussion keeps its punch and the rest stays even.',
+    compAtaqueMedio: 'medium (1–10 ms). Controls peaks but keeps some punch; natural for vocals and most instruments.',
+    compAtaqueRapido: 'fast (0.1–1 ms). Grabs peaks instantly: tames very loud hits, but can take away punch.',
+    compAyuda: '<b>Threshold:</b> the level where it starts working (lower = more compression). <b>Ratio:</b> how hard it squeezes (2:1 or 3:1 gentle, 6:1 and up strong). <b>Knee:</b> hard kicks in at once, soft eases in and sounds more musical. <b>Gain (make-up):</b> add back what the meter takes away. Use A/B to compare and don’t overdo it: constantly more than 6–8 dB squashes the sound.',
     cp_suave: 'Gentle', cp_voz: 'Vocal', cp_vozFuerte: 'Vocal up front', cp_percusion: 'Punchy percussion', cp_picos: 'Tame hits', cp_bajo: 'Bass', cp_guitarra: 'Guitar', cp_pegamento: 'Glue (mix)', cp_limitador: 'Limiter',
     patronT: 'Your microphone’s pattern', pat_cardioide: 'Cardioid', pat_omni: 'Omni', pat_bidireccional: 'Bidirectional', pat_estereo: 'Stereo',
     patTxt_cardioide: 'picks up what’s in front and rejects the sides and back. Best for recording your voice, one instrument or your percussion in an untreated room.',
@@ -1555,21 +1623,21 @@ function impulsoReverb(c, seg = 2.4) {
 const NOTAS_DELAY = { '1/4': 1, '1/8.': 0.75, '1/8': 0.5, '1/16': 0.25, '1/4.': 1.5 };
 
 /* ---------- Compresor (como el Dyn 3 de Pro Tools) ----------
- * o.cmp = { umbral (dB), ratio, ataque (ms), lib (ms), gan (dB), preset }  → compresor completo
+ * o.cmp = { umbral (dB), ratio, ataque (ms), lib (ms), rodilla (dB: 0 dura, 40 suave), gan (dB), preset }  → compresor completo
  * si no, o.comp (0 a 1) es la perilla simple de "cuánto comprimir" */
 const COMP_PRESETS = {
-  suave:      { umbral: -18, ratio: 2,   ataque: 20, lib: 220, gan: 2 },
-  voz:        { umbral: -22, ratio: 3.5, ataque: 8,  lib: 150, gan: 4 },
-  vozFuerte:  { umbral: -28, ratio: 6,   ataque: 3,  lib: 90,  gan: 7 },
-  percusion:  { umbral: -20, ratio: 4,   ataque: 30, lib: 120, gan: 3 },
-  picos:      { umbral: -16, ratio: 8,   ataque: 1,  lib: 70,  gan: 4 },
-  bajo:       { umbral: -22, ratio: 5,   ataque: 15, lib: 250, gan: 4 },
-  guitarra:   { umbral: -20, ratio: 3,   ataque: 12, lib: 180, gan: 3 },
-  pegamento:  { umbral: -14, ratio: 2,   ataque: 30, lib: 300, gan: 1.5 },
-  limitador:  { umbral: -6,  ratio: 20,  ataque: 0.5, lib: 60, gan: 3 },
+  suave:      { umbral: -18, ratio: 2,   ataque: 20, lib: 220, gan: 2, rodilla: 12 },
+  voz:        { umbral: -22, ratio: 3.5, ataque: 8,  lib: 150, gan: 4, rodilla: 8 },
+  vozFuerte:  { umbral: -28, ratio: 6,   ataque: 3,  lib: 90,  gan: 7, rodilla: 4 },
+  percusion:  { umbral: -20, ratio: 4,   ataque: 30, lib: 120, gan: 3, rodilla: 4 },
+  picos:      { umbral: -16, ratio: 8,   ataque: 1,  lib: 70,  gan: 4, rodilla: 0 },
+  bajo:       { umbral: -22, ratio: 5,   ataque: 15, lib: 250, gan: 4, rodilla: 6 },
+  guitarra:   { umbral: -20, ratio: 3,   ataque: 12, lib: 180, gan: 3, rodilla: 8 },
+  pegamento:  { umbral: -14, ratio: 2,   ataque: 30, lib: 300, gan: 1.5, rodilla: 12 },
+  limitador:  { umbral: -6,  ratio: 20,  ataque: 0.5, lib: 60, gan: 3, rodilla: 0 },
 };
 function paramsComp(o, esEntrada) {
-  if (o.cmp) return o.cmp;
+  if (o.cmp) return o.cmp.ab ? null : o.cmp;      // A/B: se escucha sin compresor mientras comparas
   if (!(o.comp > 0.001)) return null;
   return esEntrada ? { umbral: -o.comp * 30, ratio: 1.5 + o.comp * 6, ataque: 4, lib: 120, gan: 0 }
     : { umbral: -o.comp * 32, ratio: 1.5 + o.comp * 6, ataque: 6, lib: 160, gan: o.comp * 4 };
@@ -1579,6 +1647,7 @@ function ponerComp(nodo, ganancia, cp, fijar) {
   fijar(nodo.ratio, Math.max(1, Math.min(20, cp.ratio)));
   fijar(nodo.attack, Math.max(0, Math.min(1, cp.ataque / 1000)));
   fijar(nodo.release, Math.max(0.01, Math.min(1, cp.lib / 1000)));
+  fijar(nodo.knee, Math.max(0, Math.min(40, cp.rodilla == null ? 6 : cp.rodilla)));
   fijar(ganancia.gain, dbAGan(cp.gan));
 }
 
@@ -1921,6 +1990,7 @@ const EQ_PRESETS = {
   radio: [-12, -12, -8, -2, 3, 5, 4, 0, -8, -12],
 };
 const ENT = Object.assign({ gan: 0, eq: EQ_PRESETS.plano.slice(), comp: 0, rev: 0, vol: 1, conEfectos: true }, leerPref('entrada', {}));
+ENT.puerta = Object.assign({ on: false, umbral: -45, rango: -40, mantener: 80, lib: 150 }, ENT.puerta || {});
 if (!Array.isArray(ENT.eq) || ENT.eq.length !== 10) ENT.eq = EQ_PRESETS.plano.slice();
 let guardarEntradaT = null;
 const guardarEntrada = () => { clearTimeout(guardarEntradaT); guardarEntradaT = setTimeout(() => guardarPref('entrada', ENT), 400); };
@@ -1974,8 +2044,14 @@ async function prepararMic() {
   const n = { gan: ctx.createGain(), eq: crearBandas(ctx), comp: ctx.createDynamicsCompressor(), compGan: ctx.createGain(), salida: ctx.createGain(), rev: ctx.createGain(), compActivo: false, grabaDe: null };
   n.salida.channelCount = 2; n.salida.channelCountMode = 'explicit';
   n.comp.knee.value = 6; n.comp.attack.value = 0.004; n.comp.release.value = 0.12;
-  m.fuente.connect(n.gan);
-  let previo = n.gan;
+  // Compuerta de ruido justo después de la ganancia
+  n.puerta = new AudioWorkletNode(ctx, 'compuerta', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [Math.min(2, m.canales)] });
+  n.puerta.port.onmessage = (e) => { m.puertaAbierta = !!e.data; };
+  m.puertaAbierta = true;
+  m.fuente.connect(n.gan).connect(n.puerta);
+  m.medidorPre = ctx.createAnalyser(); m.medidorPre.fftSize = 1024;     // lo que entra antes de la compuerta
+  n.gan.connect(m.medidorPre);
+  let previo = n.puerta;
   for (const b of n.eq) { previo.connect(b); previo = b; }
   n.ultimo = previo;
   previo.connect(n.salida);
@@ -2002,7 +2078,7 @@ async function prepararMic() {
 function cerrarMic() {
   if (!mic) return;
   mic.stream.getTracks().forEach((x) => x.stop());
-  for (const x of [mic.fuente, mic.grabador, mic.ent.gan, ...mic.ent.eq, mic.ent.comp, mic.ent.compGan, mic.ent.salida, mic.ent.rev, mic.ent.div, ...mic.monitores]) { try { x.disconnect(); } catch (e) {} }
+  for (const x of [mic.fuente, mic.grabador, mic.ent.gan, mic.ent.puerta, ...mic.ent.eq, mic.ent.comp, mic.ent.compGan, mic.ent.salida, mic.ent.rev, mic.ent.div, ...mic.monitores]) { try { x.disconnect(); } catch (e) {} }
   mic = null;
   $('eNivelEnt').hidden = true;
 }
@@ -2040,6 +2116,10 @@ function aplicarEntrada(inmediato = false) {
   const n = mic.ent, ahora = ctx.currentTime;
   const fijar = (p, v) => { if (inmediato) p.value = v; else p.setTargetAtTime(v, ahora, 0.015); };
   fijar(n.gan.gain, dbAGan(ENT.gan));
+  const pu = ENT.puerta, pp = n.puerta.parameters;
+  pp.get('activa').value = pu.on ? 1 : 0;
+  pp.get('umbral').value = pu.umbral; pp.get('rango').value = pu.rango;
+  pp.get('mantener').value = pu.mantener; pp.get('lib').value = pu.lib;
   n.eq.forEach((b, i) => fijar(b.gain, ENT.eq[i]));
   const cp = paramsComp(ENT, true), usar = !!cp;
   if (usar !== n.compActivo) { n.ultimo.disconnect(); n.ultimo.connect(usar ? n.comp : n.salida); n.compActivo = usar; }
@@ -3731,7 +3811,7 @@ function construirEntrada() {
   const pintarSeg = () => c3.querySelectorAll('#entEfectos button').forEach((b) => b.setAttribute('aria-pressed', (b.dataset.v === 'si') === ENT.conEfectos ? 'true' : 'false'));
   c3.querySelectorAll('#entEfectos button').forEach((b) => b.onclick = () => { ENT.conEfectos = b.dataset.v === 'si'; aplicarEntrada(); pintarSeg(); });
   pintarSeg();
-  caja.append(c1, c2, c3, crearPatron());
+  caja.append(c1, c2, c3, crearPuerta());
   requestAnimationFrame(() => { pintarCurvaEq(); const m = $('entMedidor'); if (m) { m.width = Math.round(m.clientWidth * E.dpr); m.height = Math.round(m.clientHeight * E.dpr); } });
 }
 
@@ -3746,7 +3826,7 @@ function botonComp(cmp, nombre, abrir) {
   b.onclick = abrir;
   return b;
 }
-const COMP = { destino: null };
+const COMP = { destino: null, prom: 0 };
 function objComp() { return COMP.destino && (COMP.destino.entrada ? ENT : pistaDe(COMP.destino.pista)); }
 function nodoComp() {
   if (!COMP.destino) return null;
@@ -3760,9 +3840,9 @@ function cambioComp() {
 }
 // Escalas de las perillas: ataque y liberación en escala logarítmica (los valores chicos importan más)
 const logA = (v, a, b) => Math.log(v / a) / Math.log(b / a), logDe = (f, a, b) => a * Math.pow(b / a, f);
-const fmtMs = (v) => (v < 10 ? v.toFixed(1) : Math.round(v)) + ' ms';
+const fmtMs = (v) => (v < 1 ? v.toFixed(2) : v < 10 ? v.toFixed(1) : Math.round(v)) + ' ms';
 function abrirComp(destino) {
-  COMP.destino = destino;
+  COMP.destino = destino; COMP.prom = 0;
   const o = objComp();
   if (!o) return;
   if (!o.cmp) {
@@ -3797,8 +3877,9 @@ function construirMandosComp() {
   caja.append(
     mando('umbral', t('compUmbral'), { min: -60, max: 0, defecto: -20, leer: () => o.cmp.umbral, set: (v) => { o.cmp.umbral = Math.round(v * 2) / 2; }, formato: (v) => `${v.toFixed(1)} dB` }),
     mando('ratio', t('compRatio'), { min: 0, max: 1, defecto: logA(4, 1, 20), leer: () => logA(o.cmp.ratio, 1, 20), set: (f) => { o.cmp.ratio = Math.round(logDe(f, 1, 20) * 10) / 10; }, formato: (f) => `${(Math.round(logDe(f, 1, 20) * 10) / 10)}:1` }),
-    mando('ataque', t('compAtaque'), { min: 0, max: 1, defecto: logA(10, 0.3, 100), leer: () => logA(Math.max(0.3, o.cmp.ataque), 0.3, 100), set: (f) => { o.cmp.ataque = Math.round(logDe(f, 0.3, 100) * 10) / 10; }, formato: (f) => fmtMs(logDe(f, 0.3, 100)) }),
-    mando('lib', t('compLib'), { min: 0, max: 1, defecto: logA(150, 20, 1000), leer: () => logA(o.cmp.lib, 20, 1000), set: (f) => { o.cmp.lib = Math.round(logDe(f, 20, 1000)); }, formato: (f) => fmtMs(logDe(f, 20, 1000)) }),
+    mando('ataque', t('compAtaque'), { min: 0, max: 1, defecto: logA(10, 0.1, 100), leer: () => logA(Math.max(0.1, o.cmp.ataque), 0.1, 100), set: (f) => { const v = logDe(f, 0.1, 100); o.cmp.ataque = Math.round(v * (v < 1 ? 100 : 10)) / (v < 1 ? 100 : 10); }, formato: (f) => fmtMs(logDe(f, 0.1, 100)) }),
+    mando('lib', t('compLib'), { min: 0, max: 1, defecto: logA(150, 5, 1000), leer: () => logA(Math.max(5, o.cmp.lib), 5, 1000), set: (f) => { o.cmp.lib = Math.round(logDe(f, 5, 1000)); }, formato: (f) => fmtMs(logDe(f, 5, 1000)) }),
+    mando('rodilla', t('compRodilla'), { min: 0, max: 40, defecto: 6, leer: () => (o.cmp.rodilla == null ? 6 : o.cmp.rodilla), set: (v) => { o.cmp.rodilla = Math.round(v); }, formato: (v) => (v < 3 ? t('compDura') : v > 20 ? t('compSuaveR') : `${Math.round(v)} dB`) }),
     mando('gan', t('compGan'), { min: 0, max: 24, defecto: 0, leer: () => o.cmp.gan, set: (v) => { o.cmp.gan = Math.round(v * 2) / 2; }, formato: (v) => `+${v.toFixed(1)} dB` }),
   );
 }
@@ -3806,18 +3887,25 @@ function pintarComp() {
   const o = objComp();
   if (!o || !o.cmp) return;
   document.querySelectorAll('#compPresets button').forEach((b) => b.classList.toggle('active', b.dataset.preset === o.cmp.preset));
-  const a = o.cmp.ataque;
-  $('compAyuda').innerHTML = `<b>${t('compAtaque')}:</b> ${t(a >= 15 ? 'compAtaqueLento' : a <= 3 ? 'compAtaqueRapido' : 'compAtaqueMedio')}<br>${t('compAyuda')}`;
+  const a = o.cmp.ataque, l = o.cmp.lib;
+  $('compAyuda').innerHTML = `<b>${t('compAtaque')}:</b> ${t(a > 10 ? 'compAtaqueLento' : a <= 1 ? 'compAtaqueRapido' : 'compAtaqueMedio')}<br><b>${t('compLib')}:</b> ${t(l > 400 ? 'compLibLenta' : l < 100 ? 'compLibRapida' : 'compLibMedia')}<br>${t('compAyuda')}`;
+  const ab = $('compAB');
+  ab.setAttribute('aria-pressed', o.cmp.ab ? 'true' : 'false');
+  ab.textContent = t(o.cmp.ab ? 'compABsin' : 'compABcon');
 }
 // Cuánto está apretando (se llama en cada cuadro mientras la ventana está abierta)
 function pintarReduccion() {
   const n = nodoComp(), r = n ? Math.min(0, n.reduction || 0) : 0;
+  // Promedio de lo que aprieta mientras suena (para el make-up automático)
+  if (r < -0.3) COMP.prom = COMP.prom * 0.985 + r * 0.015;
   $('compReducBarra').style.width = `${Math.min(100, (-r / 20) * 100)}%`;
   $('compReducTxt').textContent = `${r < -0.05 ? '−' : ''}${Math.abs(r).toFixed(1)} dB`;
 }
 // Al cerrar (con Listo, Esc o tocando afuera) se redibuja el canal para mostrar el preset elegido
 function alCerrarComp() {
   if (!COMP.destino) return;
+  const o = objComp();
+  if (o && o.cmp && o.cmp.ab) { delete o.cmp.ab; if (COMP.destino.entrada) aplicarEntrada(); else aplicarMezcla(); }
   const ent = COMP.destino.entrada;
   COMP.destino = null;
   if (ent) construirEntrada(); else construirMezclador();
@@ -3829,47 +3917,77 @@ function cerrarComp() {
 $('dlgComp').addEventListener('close', alCerrarComp);
 $('dlgComp').addEventListener('click', (e) => { if (e.target === $('dlgComp')) cerrarComp(); });
 $('cerrarComp').onclick = cerrarComp;
+// A/B: escuchar con y sin compresor para comparar (como dice la guía de Pro Tools)
+$('compAB').onclick = () => { const o = objComp(); if (!o || !o.cmp) return; o.cmp.ab = !o.cmp.ab; if (COMP.destino.entrada) aplicarEntrada(); else aplicarMezcla(); pintarComp(); };
+// Make-up automático: sube lo mismo que el compresor está bajando
+$('compAuto').onclick = () => {
+  const o = objComp(); if (!o || !o.cmp) return;
+  const c = o.cmp, estimado = (-c.umbral) * (1 - 1 / c.ratio) * 0.35;
+  c.gan = Math.round(Math.min(24, Math.max(0, COMP.prom < -0.3 ? -COMP.prom : estimado)) * 2) / 2;
+  c.preset = null;
+  cambioComp(); construirMandosComp();
+  aviso(t('compAutoListo', { d: c.gan.toFixed(1) }), 2200);
+};
 $('compApagar').onclick = () => { const o = objComp(); if (o) { o.cmp = null; o.comp = 0; cambioComp(); } cerrarComp(); };
 
 /* =====================================================================
- * Patrón del micrófono (Blue Yeti y otros con varios patrones)
- * El navegador no puede cambiarlo: se cambia con la perilla del micrófono. Aquí se explica cuál usar.
+ * Compuerta de ruido: que no se metan sonidos del cuarto entre frase y frase
  * ===================================================================== */
-const PATRONES = {
-  cardioide: 'M12 12.9c-1.6 3.6-4.4 6.1-6.6 4.9C3 16.4 3.2 11.7 5 8.6 6.8 5.4 9.4 3.4 12 3.4s5.2 2 7 5.2c1.8 3.1 2 7.8-.4 9.2-2.2 1.2-5-1.3-6.6-4.9z',
-  omni: 'M12 3.5a8.5 8.5 0 1 1 0 17 8.5 8.5 0 0 1 0-17z',
-  bidireccional: 'M12 12c-2.6 0-4.4-1.9-4.4-4.3S9.4 3.4 12 3.4s4.4 1.9 4.4 4.3S14.6 12 12 12zm0 0c2.6 0 4.4 1.9 4.4 4.3s-1.8 4.3-4.4 4.3-4.4-1.9-4.4-4.3S9.4 12 12 12z',
-  estereo: 'M12 12.5C9 11 4.8 8.9 4.6 6.3 4.4 4 7.5 3.6 9.4 5.2 10.9 6.5 11.8 9.6 12 12.5zm0 0c3-1.5 7.2-3.6 7.4-6.2.2-2.3-2.9-2.7-4.8-1.1-1.5 1.3-2.4 4.4-2.6 7.3z',
-};
-function crearPatron() {
+function crearPuerta() {
+  const pu = ENT.puerta;
   const caja = document.createElement('div');
-  caja.className = 'e-ent-patron';
-  const elegido = leerPref('patron', 'cardioide');
-  caja.innerHTML = `<p class="e-ent-titulo" style="margin:0">${t('patronT')}</p><div class="e-patrones" role="group" aria-label="${t('patronT')}"></div><p class="e-patron-txt"></p>`;
-  const grupo = caja.querySelector('.e-patrones'), txt = caja.querySelector('.e-patron-txt');
-  const pintar = (k) => {
-    grupo.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.patron === k ? 'true' : 'false'));
-    txt.innerHTML = `<b>${t('pat_' + k)}:</b> ${t('patTxt_' + k)} ${t('patronNota')}`;
+  caja.className = 'e-ent-puerta';
+  caja.innerHTML = `<div class="e-puerta-cabeza"><p class="e-ent-titulo" style="margin:0">${t('puertaT')}</p>
+      <span class="e-puerta-led" id="puertaLed"><i></i><span></span></span>
+      <button type="button" class="e-chip${pu.on ? ' active' : ''}" id="puertaOn" aria-pressed="${pu.on}">${t(pu.on ? 'puertaPrendida' : 'puertaApagada')}</button>
+      <button type="button" class="e-chip" id="puertaMedir">${t('puertaMedir')}</button></div>
+    <div class="e-puerta-mandos"></div>
+    <p class="e-patron-txt">${t('puertaAyuda')} ${t('patronCorto')}</p>`;
+  const mandos = caja.querySelector('.e-puerta-mandos');
+  const cambio = () => { guardarEntrada(); aplicarEntrada(); };
+  mandos.append(
+    crearPerilla({ etiqueta: t('compUmbral'), aria: `${t('puertaT')}: ${t('compUmbral')}`, min: -80, max: -10, defecto: -45, siempreValor: true, leer: () => pu.umbral, poner: (v) => { pu.umbral = Math.round(v); cambio(); }, formato: (v) => `${Math.round(v)} dB` }),
+    crearPerilla({ etiqueta: t('puertaRango'), aria: `${t('puertaT')}: ${t('puertaRango')}`, min: -80, max: 0, defecto: -40, siempreValor: true, leer: () => pu.rango, poner: (v) => { pu.rango = Math.round(v); cambio(); }, formato: (v) => `${Math.round(v)} dB` }),
+    crearPerilla({ etiqueta: t('puertaMantener'), aria: `${t('puertaT')}: ${t('puertaMantener')}`, min: 0, max: 500, defecto: 80, siempreValor: true, leer: () => pu.mantener, poner: (v) => { pu.mantener = Math.round(v); cambio(); }, formato: (v) => `${Math.round(v)} ms` }),
+    crearPerilla({ etiqueta: t('compLib'), aria: `${t('puertaT')}: ${t('compLib')}`, min: 0, max: 1, defecto: logA(150, 10, 1500), siempreValor: true, leer: () => logA(Math.max(10, pu.lib), 10, 1500), poner: (f) => { pu.lib = Math.round(logDe(f, 10, 1500)); cambio(); }, formato: (f) => fmtMs(logDe(f, 10, 1500)) }),
+  );
+  ['compUmbral', 'puertaRango', 'puertaMantener', 'compLib'].forEach((k, i) => {
+    const n = document.createElement('div'); n.className = 'comp-nombre'; n.textContent = t(k);
+    mandos.children[i].appendChild(n);
+  });
+  caja.querySelector('#puertaOn').onclick = () => {
+    pu.on = !pu.on; cambio();
+    if (pu.on && !mic) prepararMic().catch(() => aviso(t('micSinPermiso')));
+    construirEntrada();
   };
-  for (const k of Object.keys(PATRONES)) {
-    const b = document.createElement('button');
-    b.type = 'button'; b.className = 'e-patron'; b.dataset.patron = k;
-    b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${PATRONES[k]}" fill="currentColor" fill-opacity=".18" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg><span>${t('pat_' + k)}</span>`;
-    b.onclick = () => {
-      guardarPref('patron', k);
-      pintar(k);
-      // En estéreo la pista elegida graba los dos lados (izquierda y derecha)
-      const p = pistaDe(E.pistaSel) || P.pistas.find((x) => x.arm);
-      if (p && (k === 'estereo') !== (p.entrada === 'estereo')) {
-        p.entrada = k === 'estereo' ? 'estereo' : '1';
-        aplicarMonitores(); guardarPronto(); construirPistas();
-        aviso(t(k === 'estereo' ? 'patronEstereoPista' : 'patronMonoPista', { p: p.nombre }), 3500);
-      }
-    };
-    grupo.appendChild(b);
-  }
-  pintar(elegido);
+  caja.querySelector('#puertaMedir').onclick = medirRuido;
   return caja;
+}
+// Escucha el cuarto 2 segundos en silencio y pone el umbral un poco por encima del ruido
+async function medirRuido() {
+  try { await prepararMic(); } catch (e) { aviso(t('micSinPermiso')); return; }
+  const b = $('puertaMedir');
+  if (b) { b.disabled = true; b.textContent = t('puertaMidiendo'); }
+  let pico = 0;
+  const fin = performance.now() + 2000;
+  await new Promise((ok) => {
+    const paso = () => { pico = Math.max(pico, picoDe(mic.medidorPre)); if (performance.now() < fin) setTimeout(paso, 30); else ok(); };
+    paso();
+  });
+  const ruido = dbDe(pico);
+  ENT.puerta.umbral = Math.round(Math.max(-80, Math.min(-10, (isFinite(ruido) ? ruido : -80) + 6)));
+  ENT.puerta.on = true;
+  guardarEntrada(); aplicarEntrada();
+  construirEntrada();
+  aviso(t('puertaMedida', { r: isFinite(ruido) ? Math.round(ruido) : '−∞', u: ENT.puerta.umbral }), 4500);
+}
+function pintarPuerta() {
+  const led = $('puertaLed');
+  if (!led) return;
+  const on = ENT.puerta.on && !!mic, abierta = !on || mic.puertaAbierta;
+  led.className = 'e-puerta-led' + (on ? (abierta ? ' abierta' : ' cerrada') : '');
+  const txt = on ? t(abierta ? 'puertaAbierta' : 'puertaCerrada') : '';
+  if (led.lastElementChild.textContent !== txt) led.lastElementChild.textContent = txt;
 }
 
 /* =====================================================================
@@ -4479,6 +4597,7 @@ function cuadro(ahora) {
     const [v, pk] = nivel('ent', entDb, dt, ahora);
     dibujarMedidor($('entMedidor'), [v], pk);
     pintarEstadoNivel(entDb, ahora);
+    pintarPuerta();
   }
   if (ahora - cuadroAf > 60) { cuadroAf = ahora; pintarAfinador(); }
 }
