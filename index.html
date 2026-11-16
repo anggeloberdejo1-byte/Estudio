@@ -318,6 +318,9 @@
   .e-ms .s.active { background: var(--focus); border-color: var(--focus); color: #1a1408; }
   .e-ms .r.active { background: var(--ember); border-color: var(--ember); color: #fff; animation: latidoRec 1.4s ease-in-out infinite; }
   .e-ms .mon.active { background: var(--e-acento); border-color: var(--e-acento); color: var(--e-fondo); }
+  .e-ms .mon.auto { border-color: var(--e-acento); color: var(--e-acento); box-shadow: inset 0 0 0 1px var(--e-acento); }
+  .e-ent-estado { margin: 6px 0 0; font-size: 11.5px; line-height: 1.3; color: var(--e-tenue); text-align: center; min-height: 2.6em; }
+  .e-ent-estado.bien { color: #5fb27f; } .e-ent-estado.fuerte { color: #e0a84a; } .e-ent-estado.alto { color: #e2604a; font-weight: 600; }
   .e-ent-pista { height: 26px; border-radius: 7px; border: 1px solid var(--e-borde); background: var(--e-pozo); color: var(--e-tenue); font: 600 11px var(--fuente); padding: 0 2px; max-width: 74px; cursor: pointer; }
   .e-ent-pista option { color: initial; }
   .e-vol-mini { flex: 0 1 64px; min-width: 36px; height: 22px; accent-color: var(--c); }
@@ -647,6 +650,7 @@
         <button class="e-tr rec" id="grabar" type="button" data-i18n-aria="grabar" aria-label="Grabar" title="R"><span class="punto" aria-hidden="true"></span></button>
         <button class="e-tr" id="loopBtn" type="button" aria-pressed="false" data-i18n-aria="loop" aria-label="Loop" title="L"><svg class="icono" aria-hidden="true"><use href="#i-loop"/></svg></button>
         <button class="e-tr" id="clickBtn" type="button" aria-pressed="false" data-i18n-aria="metronomo" aria-label="Metrónomo" title="K"><svg class="icono" aria-hidden="true"><use href="#i-metronomo"/></svg></button>
+        <button class="e-tr" id="escuchaBtn" type="button" aria-pressed="true" data-i18n-aria="escucharme" aria-label="Escucharme al grabar" data-i18n-titulo="escucharmeT"><svg class="icono" aria-hidden="true"><use href="#i-solo"/></svg></button>
       </div>
       <div class="e-lcd" id="lcd">
         <div class="grande"><span class="e-lcd-num" id="lcdCompas">001.1.1</span><small data-i18n="lcdCompasT">Compás</small></div>
@@ -760,6 +764,20 @@
         <select id="ajSalida"><option value="" data-i18n="micDef">El del sistema</option></select>
       </label>
       <p class="nota-ajustes" id="salidaSinOpcion" data-i18n="salidaSafari" hidden style="margin-top:10px">Este navegador no deja elegir la salida aquí: cámbiala en los ajustes de sonido del sistema.</p>
+      <p class="settings-section-title" style="margin-top:16px" data-i18n="escuchaT">Escucharte mientras grabas</p>
+      <div class="seg" id="ajEscucha">
+        <button type="button" data-escucha="auto" data-i18n="escuchaAuto">Automático</button>
+        <button type="button" data-escucha="entrada" data-i18n="escuchaEntrada">Siempre la entrada</button>
+        <button type="button" data-escucha="no" data-i18n="escuchaNo">Apagado</button>
+      </div>
+      <p class="nota-ajustes" id="escuchaNota" style="margin-top:8px"></p>
+      <p class="settings-section-title" style="margin-top:16px" data-i18n="clickSonidoT">Sonido del metrónomo</p>
+      <div class="seg" id="ajClickSonido">
+        <button type="button" data-sonido="clic" data-i18n="sonClic">Clic</button>
+        <button type="button" data-sonido="cencerro" data-i18n="sonCencerro">Cencerro</button>
+        <button type="button" data-sonido="madera" data-i18n="sonMadera">Madera</button>
+        <button type="button" data-sonido="baqueta" data-i18n="sonBaqueta">Baqueta</button>
+      </div>
       <p class="settings-section-title" style="margin-top:16px" data-i18n="cuentaT">Cuenta antes de grabar</p>
       <div class="seg" id="ajCuenta">
         <button type="button" data-cuenta="0" data-i18n="no">No</button>
@@ -788,22 +806,48 @@
       <p class="nota-ajustes" id="latNota" role="status" aria-live="polite" style="margin-top:10px"></p>
       <p class="nota-ajustes" data-i18n="latAyuda">Para calibrar: quita los audífonos y sube el volumen. La app toca 6 clics y mide cuánto tardan en volver por el micrófono. Así tus tomas quedan exactas a tiempo.</p>
     </div>
-    <div class="settings-section">
+    <div class="settings-section" id="atajos">
       <p class="settings-section-title" data-i18n="atajosT">Atajos de teclado</p>
+      <p class="nota-ajustes" data-i18n="atajosNota" style="margin-bottom:10px">⌘ es Ctrl en Windows. Toca ? en cualquier momento para ver esta lista.</p>
       <dl class="atajos-lista">
         <dt><kbd>Espacio</kbd></dt><dd data-i18n="aTocar">Tocar / parar</dd>
         <dt><kbd>R</kbd></dt><dd data-i18n="aGrabar">Grabar / parar la grabación</dd>
         <dt><kbd>Enter</kbd></dt><dd data-i18n="aInicio">Al inicio (o al inicio del loop)</dd>
         <dt><kbd>L</kbd></dt><dd data-i18n="aLoop">Prender o apagar el loop</dd>
         <dt><kbd>K</kbd></dt><dd data-i18n="aClick">Metrónomo</dd>
+        <dt><kbd>I</kbd></dt><dd data-i18n="aEscucha">Escucharme al grabar (prender / apagar)</dd>
+        <dt><kbd>←</kbd> <kbd>→</kbd></dt><dd data-i18n="aMover">Un compás atrás / adelante</dd>
+        <dt><kbd>Alt</kbd> <kbd>←</kbd> <kbd>→</kbd></dt><dd data-i18n="aPulso">Un pulso atrás / adelante</dd>
+        <dt><kbd>↑</kbd> <kbd>↓</kbd></dt><dd data-i18n="aPistaSel">Elegir la pista de arriba / de abajo</dd>
+        <dt><kbd>⇧R</kbd></dt><dd data-i18n="aArmar">Armar la pista elegida (R)</dd>
+        <dt><kbd>⇧M</kbd> · <kbd>⇧S</kbd></dt><dd data-i18n="aMuteSolo">Silenciar / solo de la pista elegida</dd>
+        <dt><kbd>⇧I</kbd></dt><dd data-i18n="aMonPista">🎧 de la pista elegida (escucharme siempre)</dd>
+        <dt><kbd>N</kbd></dt><dd data-i18n="aNueva">Pista nueva</dd>
         <dt><kbd>S</kbd> · <kbd>⌘E</kbd></dt><dd data-i18n="aCortar">Cortar el clip en el cabezal</dd>
+        <dt><kbd>⌘C</kbd> · <kbd>⌘V</kbd></dt><dd data-i18n="aCopiarPegar">Copiar el clip / pegarlo en el cabezal</dd>
         <dt><kbd>⌘D</kbd></dt><dd data-i18n="aDuplicar">Duplicar el clip</dd>
         <dt><kbd>⌫</kbd></dt><dd data-i18n="aBorrar">Borrar el clip elegido</dd>
         <dt><kbd>⌘Z</kbd> · <kbd>⇧⌘Z</kbd></dt><dd data-i18n="aDeshacer">Deshacer / rehacer</dd>
-        <dt><kbd>←</kbd> <kbd>→</kbd></dt><dd data-i18n="aMover">Un compás atrás / adelante</dd>
-        <dt><kbd>+</kbd> <kbd>−</kbd></dt><dd>Zoom</dd>
         <dt><kbd>B</kbd></dt><dd data-i18n="aMarca">Poner una marca</dd>
+        <dt><kbd>+</kbd> <kbd>−</kbd></dt><dd>Zoom</dd>
+        <dt><kbd>0</kbd></dt><dd data-i18n="aVerTodo">Ver todo el proyecto</dd>
+        <dt><kbd>F</kbd></dt><dd data-i18n="aSeguir">Seguir la reproducción</dd>
+        <dt><kbd>G</kbd></dt><dd data-i18n="aRejilla">Cambiar la rejilla</dd>
+        <dt><kbd>T</kbd></dt><dd data-i18n="aTempo">Tempo y compás</dd>
+        <dt><kbd>Tab</kbd></dt><dd data-i18n="aMezclador">Pistas / mezclador</dd>
+        <dt><kbd>E</kbd></dt><dd data-i18n="aExportar">Exportar</dd>
+        <dt><kbd>⌘S</kbd></dt><dd data-i18n="aGuardar">Guardar ahora (igual se guarda solo)</dd>
         <dt><kbd>Alt</kbd> + <span data-i18n="arrastrar">arrastrar</span></dt><dd data-i18n="aCopiar">Copiar el clip</dd>
+        <dt><kbd>?</kbd></dt><dd data-i18n="aAtajos">Ver esta lista</dd>
+      </dl>
+      <p class="settings-section-title" style="margin-top:14px" data-i18n="numericoT">Teclado numérico (como Pro Tools)</p>
+      <dl class="atajos-lista">
+        <dt><kbd>0</kbd></dt><dd data-i18n="aTocar">Tocar / parar</dd>
+        <dt><kbd>3</kbd></dt><dd data-i18n="aGrabar">Grabar / parar la grabación</dd>
+        <dt><kbd>1</kbd> <kbd>2</kbd></dt><dd data-i18n="aMover">Un compás atrás / adelante</dd>
+        <dt><kbd>4</kbd></dt><dd data-i18n="aLoop">Prender o apagar el loop</dd>
+        <dt><kbd>7</kbd></dt><dd data-i18n="aClick">Metrónomo</dd>
+        <dt><kbd>Enter</kbd></dt><dd data-i18n="aMarca">Poner una marca</dd>
       </dl>
     </div>
   </div>
@@ -851,6 +895,15 @@
       <div class="seg" id="expRango">
         <button type="button" data-rango="todo" data-i18n="expTodo">Todo el proyecto</button>
         <button type="button" data-rango="loop" id="expLoopBtn"><span data-i18n="expLoop">Solo el loop</span> <small id="expLoopTxt" class="num"></small></button>
+      </div>
+    </div>
+    <div class="settings-section">
+      <p class="settings-section-title" data-i18n="expFundidoT">Fundido de salida al final</p>
+      <div class="seg" id="expFundido">
+        <button type="button" data-fundido="0" data-i18n="no">No</button>
+        <button type="button" data-fundido="3">3 s</button>
+        <button type="button" data-fundido="6">6 s</button>
+        <button type="button" data-fundido="10">10 s</button>
       </div>
     </div>
     <div class="settings-section">
@@ -945,7 +998,7 @@ const TEXTOS = {
     entGanancia: 'Ganancia', entEq: 'Ecualizador', entVolumen: 'Me escucho', entGrabarCon: 'La toma se graba', entConEfectos: 'Con EQ y compresor', entSinEfectos: 'Tal cual entra',
     entNotaRev: 'La reverb es solo para escucharte; no se graba.', afinador: 'Afinador', afSinSenal: 'Toca una nota',
     eqP_plano: 'Plano', eqP_vozClara: 'Voz clara', eqP_calida: 'Cálida', eqP_brillo: 'Brillo', eqP_menosGraves: 'Menos graves', eqP_radio: 'Radio',
-    consejoT: 'Usa audífonos al grabar.', consejoTxt: 'Así el micrófono no capta la base. Para escucharte, prende el audífono 🎧 de la pista. Si tu micrófono o interfaz tiene salida de audífonos, conéctalos ahí: te escuchas sin retraso.',
+    consejoT: 'Usa audífonos al grabar.', consejoTxt: 'Así el micrófono no capta la base. Al armar una pista (R) te escuchas solo; el botón 🎧 de arriba (tecla I) lo apaga. Si tu micrófono o interfaz tiene salida de audífonos, conéctalos ahí: te escuchas sin retraso.',
     grabT: 'Grabación', salidaT: 'Salida de audio (audífonos o parlantes)', salidaSafari: 'Este navegador no deja elegir la salida aquí: cámbiala en los ajustes de sonido del sistema.', salidaLista: 'Salida de audio cambiada',
     cuentaT: 'Cuenta antes de grabar', cuenta1: '1 compás', cuenta2: '2 compases', clickModoT: 'Metrónomo', clickSiempre: 'Siempre que esté prendido', clickGrabando: 'Solo al grabar', clickVolT: 'Volumen del metrónomo',
     latT: 'Compensación de latencia', latCalibrar: 'Calibrar', latAutoT: 'Automática', latAuto: 'Automática: el navegador la calcula. Calibra para más precisión.', latCalibrada: 'Calibrada con tus parlantes y tu micrófono.', latManual: 'Ajustada a mano.',
@@ -967,6 +1020,19 @@ const TEXTOS = {
     deshecho: 'Deshecho', rehecho: 'Rehecho', nadaDeshacer: 'No hay nada que deshacer', cortado: 'Clip cortado', normalizado: 'Clip normalizado ({d} dB)',
     sinEspacio: 'No hay espacio para guardar. Libera espacio o borra proyectos viejos.', errorT: 'Error', clicDerecho: 'Clic derecho (o mantener presionado) en un clip para más opciones',
     sinSoporte: 'Este navegador no puede grabar audio. Usa Chrome, Edge o Safari recientes.',
+    escucharme: 'Escucharme al grabar', escucharmeT: 'Escucharme al grabar (I)', escuchaT: 'Escucharte mientras grabas', escuchaAuto: 'Automático', escuchaEntrada: 'Siempre', escuchaNo: 'Apagado',
+    escuchaAutoNota: 'Como en Pro Tools: al armar una pista (R) te escuchas por ella mientras está parada y mientras grabas. Al reproducir, oyes lo que ya grabaste. Usa audífonos.',
+    escuchaEntradaNota: 'Las pistas armadas (R) te dejan escucharte siempre, también mientras reproduces. Usa audífonos.',
+    escuchaNoNota: 'La app no te devuelve tu voz. Úsalo si te escuchas por la salida de audífonos de tu micrófono o interfaz (sin retraso). El 🎧 de cada pista sigue funcionando.',
+    escuchaPrendida: '🎧 Te escuchas al grabar', escuchaApagada: 'Escucha apagada: ya no te devuelve tu voz',
+    clickSonidoT: 'Sonido del metrónomo', sonClic: 'Clic', sonCencerro: 'Cencerro', sonMadera: 'Madera', sonBaqueta: 'Baqueta',
+    expFundidoT: 'Fundido de salida al final', nivelSinMic: 'Arma una pista (R) o prende 🎧 para ver tu nivel.',
+    nivelNada: 'No entra sonido', nivelBajo: 'Nivel bajo: sube la ganancia', nivelBien: 'Buen nivel', nivelFuerte: 'Fuerte: está bien solo en lo más intenso', nivelAlto: '¡Se satura! Baja la ganancia',
+    copiado: 'Clip copiado', pegado: 'Clip pegado', pistaNueva: 'Pista nueva', seguirSi: 'Sigue la reproducción', seguirNo: 'Ya no sigue la reproducción',
+    atajosNota: '⌘ es Ctrl en Windows. Toca ? en cualquier momento para ver esta lista.', numericoT: 'Teclado numérico (como Pro Tools)',
+    aEscucha: 'Escucharme al grabar (prender / apagar)', aPulso: 'Un pulso atrás / adelante', aPistaSel: 'Elegir la pista de arriba / de abajo', aArmar: 'Armar la pista elegida (R)', aMuteSolo: 'Silenciar / solo de la pista elegida',
+    aMonPista: '🎧 de la pista elegida (escucharme siempre)', aNueva: 'Pista nueva', aCopiarPegar: 'Copiar el clip / pegarlo en el cabezal', aVerTodo: 'Ver todo el proyecto', aSeguir: 'Seguir la reproducción',
+    aRejilla: 'Cambiar la rejilla', aTempo: 'Tempo y compás', aMezclador: 'Pistas / mezclador', aExportar: 'Exportar', aGuardar: 'Guardar ahora (igual se guarda solo)', aAtajos: 'Ver esta lista',
   },
   en: {
     eyebrow: 'Tools for musicians', ajustes: 'Settings', cerrar: 'Close', listo: 'Done', no: 'No', entendido: 'Got it',
@@ -996,7 +1062,7 @@ const TEXTOS = {
     entGanancia: 'Gain', entEq: 'Equalizer', entVolumen: 'Hear me', entGrabarCon: 'The take is recorded', entConEfectos: 'With EQ and compressor', entSinEfectos: 'Dry',
     entNotaRev: 'Reverb is only for hearing yourself; it isn’t recorded.', afinador: 'Tuner', afSinSenal: 'Play a note',
     eqP_plano: 'Flat', eqP_vozClara: 'Clear voice', eqP_calida: 'Warm', eqP_brillo: 'Bright', eqP_menosGraves: 'Less bass', eqP_radio: 'Radio',
-    consejoT: 'Use headphones when recording.', consejoTxt: 'That way the mic doesn’t pick up the backing track. To hear yourself, turn on the track’s 🎧 button. If your mic or interface has a headphone output, plug them in there: no delay at all.',
+    consejoT: 'Use headphones when recording.', consejoTxt: 'That way the mic doesn’t pick up the backing track. When you arm a track (R) you hear yourself; the 🎧 button up top (key I) turns it off. If your mic or interface has a headphone output, plug them in there: no delay at all.',
     grabT: 'Recording', salidaT: 'Audio output (headphones or speakers)', salidaSafari: 'This browser can’t choose the output here: change it in the system sound settings.', salidaLista: 'Audio output changed',
     cuentaT: 'Count-in before recording', cuenta1: '1 bar', cuenta2: '2 bars', clickModoT: 'Metronome', clickSiempre: 'Whenever it’s on', clickGrabando: 'Only while recording', clickVolT: 'Metronome volume',
     latT: 'Latency compensation', latCalibrar: 'Calibrate', latAutoT: 'Automatic', latAuto: 'Automatic: the browser estimates it. Calibrate for more precision.', latCalibrada: 'Calibrated with your speakers and microphone.', latManual: 'Set by hand.',
@@ -1018,6 +1084,19 @@ const TEXTOS = {
     deshecho: 'Undone', rehecho: 'Redone', nadaDeshacer: 'Nothing to undo', cortado: 'Clip split', normalizado: 'Clip normalized ({d} dB)',
     sinEspacio: 'There’s no room to save. Free up space or delete old projects.', errorT: 'Error', clicDerecho: 'Right-click (or long-press) a clip for more options',
     sinSoporte: 'This browser can’t record audio. Use a recent Chrome, Edge or Safari.',
+    escucharme: 'Hear myself while recording', escucharmeT: 'Hear myself while recording (I)', escuchaT: 'Hearing yourself while recording', escuchaAuto: 'Automatic', escuchaEntrada: 'Always', escuchaNo: 'Off',
+    escuchaAutoNota: 'Like Pro Tools: when you arm a track (R) you hear yourself through it while stopped and while recording. On playback you hear what you recorded. Use headphones.',
+    escuchaEntradaNota: 'Armed tracks (R) always let you hear yourself, even during playback. Use headphones.',
+    escuchaNoNota: 'The app doesn’t send your voice back. Use it if you listen through your mic’s or interface’s headphone output (zero delay). Each track’s 🎧 still works.',
+    escuchaPrendida: '🎧 You hear yourself while recording', escuchaApagada: 'Monitoring off: your voice isn’t sent back',
+    clickSonidoT: 'Metronome sound', sonClic: 'Click', sonCencerro: 'Cowbell', sonMadera: 'Woodblock', sonBaqueta: 'Stick',
+    expFundidoT: 'Fade out at the end', nivelSinMic: 'Arm a track (R) or turn on 🎧 to see your level.',
+    nivelNada: 'No sound coming in', nivelBajo: 'Low level: turn the gain up', nivelBien: 'Good level', nivelFuerte: 'Loud: fine only on the loudest parts', nivelAlto: 'Clipping! Turn the gain down',
+    copiado: 'Clip copied', pegado: 'Clip pasted', pistaNueva: 'New track', seguirSi: 'Following playback', seguirNo: 'Not following playback',
+    atajosNota: '⌘ is Ctrl on Windows. Press ? anytime to see this list.', numericoT: 'Numeric keypad (like Pro Tools)',
+    aEscucha: 'Hear myself while recording (on / off)', aPulso: 'One beat back / forward', aPistaSel: 'Select the track above / below', aArmar: 'Arm the selected track (R)', aMuteSolo: 'Mute / solo the selected track',
+    aMonPista: 'Selected track’s 🎧 (always hear myself)', aNueva: 'New track', aCopiarPegar: 'Copy the clip / paste it at the playhead', aVerTodo: 'Fit the whole project', aSeguir: 'Follow playback',
+    aRejilla: 'Change the grid', aTempo: 'Tempo and time signature', aMezclador: 'Tracks / mixer', aExportar: 'Export', aGuardar: 'Save now (it also saves by itself)', aAtajos: 'Show this list',
   },
 };
 
@@ -1639,18 +1718,47 @@ function irA(s) {
 
 /* ---------- Metrónomo ---------- */
 function clickActivo() { return P.click && (leerPref('clickModo', 'siempre') === 'siempre' || !!R.grabando); }
-function sonarClick(cuando, tipo) {
-  const o = ctx.createOscillator(), g = ctx.createGain();
-  o.type = 'triangle';
-  o.frequency.value = tipo === 2 ? 1760 : tipo === 1 ? 1320 : 1000;
-  const v = tipo === 2 ? 0.9 : 0.55;
-  g.gain.setValueAtTime(0, cuando);
-  g.gain.linearRampToValueAtTime(v, cuando + 0.001);
-  g.gain.exponentialRampToValueAtTime(0.001, cuando + 0.05);
-  o.connect(g).connect(G.click);
-  o.start(cuando); o.stop(cuando + 0.06);
-  R.fuentes.push(o);
+// Sonidos del metrónomo: clic, cencerro, bloque de madera y baqueta (tipo 2 = primer tiempo del compás)
+const ruidoDe = new WeakMap();
+function ruido(c) {
+  let b = ruidoDe.get(c);
+  if (!b) {
+    b = c.createBuffer(1, Math.round(c.sampleRate * 0.1), c.sampleRate);
+    const d = b.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    ruidoDe.set(c, b);
+  }
+  return b;
 }
+function golpeClick(c, destino, cuando, tipo, fuentes) {
+  const sonido = leerPref('clickSonido', 'clic'), fuerte = tipo === 2, g = c.createGain();
+  g.connect(destino);
+  const env = (v, dur) => { g.gain.setValueAtTime(0, cuando); g.gain.linearRampToValueAtTime(v, cuando + 0.001); g.gain.exponentialRampToValueAtTime(0.001, cuando + dur); };
+  const osc = (tipoOnda, f, fin) => { const o = c.createOscillator(); o.type = tipoOnda; o.frequency.value = f; o.start(cuando); o.stop(cuando + fin); fuentes.push(o); return o; };
+  if (sonido === 'cencerro') {
+    const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = fuerte ? 1150 : 1000; bp.Q.value = 2.2;
+    bp.connect(g);
+    const k = fuerte ? 1.12 : 1;
+    osc('square', 540 * k, 0.3).connect(bp); osc('square', 800 * k, 0.3).connect(bp);
+    env(fuerte ? 1.1 : 0.7, 0.26);
+  } else if (sonido === 'madera') {
+    const o = osc('sine', 0, 0.08);
+    const f = fuerte ? 1900 : tipo === 1 ? 1500 : 1250;
+    o.frequency.setValueAtTime(f * 1.25, cuando); o.frequency.exponentialRampToValueAtTime(f, cuando + 0.012);
+    o.connect(g);
+    env(fuerte ? 1 : 0.7, 0.06);
+  } else if (sonido === 'baqueta') {
+    const n = c.createBufferSource(); n.buffer = ruido(c);
+    const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = fuerte ? 2600 : 3600; bp.Q.value = 1.4;
+    n.connect(bp).connect(g); n.start(cuando); n.stop(cuando + 0.06); fuentes.push(n);
+    const o = osc('triangle', fuerte ? 1800 : 2400, 0.03); o.connect(g);
+    env(fuerte ? 1.3 : 0.8, 0.035);
+  } else {
+    osc('triangle', fuerte ? 1760 : tipo === 1 ? 1320 : 1000, 0.06).connect(g);
+    env(fuerte ? 0.9 : 0.55, 0.05);
+  }
+}
+function sonarClick(cuando, tipo) { golpeClick(ctx, G.click, cuando, tipo, R.fuentes); }
 const tipoPulso = (i) => (i % P.num === 0 ? 2 : (P.den === 8 && P.num % 3 === 0 && i % 3 === 0) ? 1 : 0);
 function programarClicks(hasta) {
   const desde = R.clickHasta;
@@ -1836,7 +1944,7 @@ function aplicarEntrada(inmediato = false) {
   // Reverb solo para escucharte (va a la reverb del mezclador)
   try { n.rev.disconnect(); } catch (e) {}
   if (G) n.rev.connect(G.rev);
-  const alguno = P && P.pistas.some((p) => p.mon);
+  const alguno = P && P.pistas.some(escuchaDe);
   fijar(n.rev.gain, alguno ? ENT.rev * ENT.vol : 0);
   // Qué se graba: con EQ y compresor, o tal cual entra
   const fuente = ENT.conEfectos ? n.salida : mic.fuente;
@@ -1848,14 +1956,48 @@ function aplicarEntrada(inmediato = false) {
   for (const g of mic.monitores) if (g.gain) fijar(g.gain, ENT.vol * (g._k || 1));
 }
 
-// Te escuchas por cada pista que tenga 🎧 prendido, con los efectos y el fader de esa pista
+/* ---------- Escucharte mientras grabas (como Pro Tools) ----------
+ * auto:    la pista armada (R) te deja escucharte parado y grabando; al reproducir suena lo ya grabado
+ * entrada: la pista armada te deja escucharte siempre
+ * no:      solo por las pistas con 🎧 (si te escuchas por la salida de audífonos de tu micrófono o interfaz)
+ * El 🎧 de cada pista te deja escucharte siempre por esa pista, armada o no. */
+const modoEscucha = () => leerPref('escucha', 'auto');
+function escuchaDe(p) {
+  if (p.mon) return true;
+  if (!p.arm) return false;
+  const m = modoEscucha();
+  if (m === 'entrada') return true;
+  if (m === 'auto') return !R.sonando || !!R.grabando;
+  return false;
+}
+let firmaEscucha = '';
+function actualizarEscucha() {
+  if (!P) return;
+  const b = $('escuchaBtn');
+  if (b) b.setAttribute('aria-pressed', modoEscucha() !== 'no' ? 'true' : 'false');
+  document.querySelectorAll('#cabMover .e-pista').forEach((f) => {
+    const p = pistaDe(f.dataset.id), m = f.querySelector('[data-acc="mon"]');
+    if (p && m) m.classList.toggle('auto', !p.mon && escuchaDe(p));
+  });
+  const firma = P.pistas.map((p) => (escuchaDe(p) ? p.id + p.entrada : '')).join('|');
+  if (firma !== firmaEscucha && mic) aplicarMonitores();
+}
+// Al armar una pista (o prender la escucha) se abre el micrófono para que te escuches de una vez
+function prepararEscucha() {
+  if (!P || !P.pistas.some(escuchaDe)) { actualizarEscucha(); return; }
+  prepararMic().then(actualizarEscucha).catch(() => {});
+  if (!leerPref('consejoVisto', false) && $('consejo').hidden) { $('consejo').hidden = false; requestAnimationFrame(redimensionar); }
+}
+
+// Te escuchas por cada pista que tenga 🎧 prendido (o armada, según el modo), con los efectos y el fader de esa pista
 function aplicarMonitores() {
   if (!mic || !G || !P) return;
   for (const x of mic.monitores) { try { x.disconnect(); } catch (e) {} }
   mic.monitores = [];
+  firmaEscucha = P.pistas.map((p) => (escuchaDe(p) ? p.id + p.entrada : '')).join('|');
   const div = mic.ent.div;
   for (const p of P.pistas) {
-    if (!p.mon) continue;
+    if (!escuchaDe(p)) continue;
     const k = G.canales.get(p.id);
     if (!k) continue;
     const ganancia = (canal, mult) => { const g = ctx.createGain(); g._k = mult; g.gain.value = ENT.vol * mult; div.connect(g, canal); g.connect(k.entrada); mic.monitores.push(g); return g; };
@@ -2260,6 +2402,7 @@ function construirPistas() {
   });
   caja.style.transform = `translateY(${-E.scrollY}px)`;
   $('ayudaVacia').hidden = !!P.pistas.some((p) => p.clips.length) || !!R.grabando;
+  actualizarEscucha();
   E.sucio = true;
 }
 const cabezas = $('cabMover');
@@ -2269,7 +2412,7 @@ cabezas.addEventListener('click', (e) => {
   const p = pistaDe(fila.dataset.id);
   const b = e.target.closest('[data-acc]');
   const acc = b && b.dataset.acc;
-  if (acc === 'arm') { if (R.grabando) return; p.arm = !p.arm; }
+  if (acc === 'arm') { if (R.grabando) return; p.arm = !p.arm; E.pistaSel = p.id; construirPistas(); construirMezclador(); prepararEscucha(); return; }
   else if (acc === 'mute') p.mute = !p.mute;
   else if (acc === 'solo') {
     if (e.altKey || e.metaKey) { const otro = !p.solo; P.pistas.forEach((x) => { x.solo = false; }); p.solo = otro; } else p.solo = !p.solo;
@@ -3292,6 +3435,7 @@ function crearCanal(p) {
       if (b.dataset.acc === 'mute') p.mute = !p.mute;
       if (b.dataset.acc === 'solo') p.solo = !p.solo;
       aplicarMezcla(); construirPistas(); construirMezclador();
+      if (b.dataset.acc === 'arm') prepararEscucha();
     };
     c.addEventListener('pointerdown', (e) => { if (!e.target.closest('.e-perilla, .e-fader, button')) { E.pistaSel = p.id; construirPistas(); document.querySelectorAll('.e-canal').forEach((x) => x.classList.toggle('elegida', x.dataset.id === p.id)); } });
   } else {
@@ -3452,7 +3596,7 @@ function construirEntrada() {
   caja.innerHTML = '';
   const c1 = document.createElement('div'); c1.className = 'e-ent-nivel';
   c1.appendChild(crearPerilla({ etiqueta: t('entGanancia'), aria: t('entGanancia'), min: -24, max: 24, defecto: 0, bipolar: true, leer: () => ENT.gan, poner: (v) => { ENT.gan = Math.round(v * 2) / 2; aplicarEntrada(); }, formato: fmtDbEq }));
-  c1.insertAdjacentHTML('beforeend', '<canvas class="e-medidor e-ent-medidor" id="entMedidor"></canvas>');
+  c1.insertAdjacentHTML('beforeend', `<canvas class="e-medidor e-ent-medidor" id="entMedidor"></canvas><p class="e-ent-estado" id="entEstado" aria-live="polite">${mic ? '' : t('nivelSinMic')}</p>`);
   const c2 = document.createElement('div'); c2.className = 'e-ent-eq';
   c2.innerHTML = `<div class="e-eq-presets"></div><div class="e-eq-zona"><canvas id="eEqCurva"></canvas><div class="e-eq-bandas"></div></div>`;
   const pres = c2.querySelector('.e-eq-presets');
@@ -3484,7 +3628,7 @@ function construirEntrada() {
 /* =====================================================================
  * Exportar (WAV de 16 o 24 bits)
  * ===================================================================== */
-const EXP = { que: 'mezcla', rango: 'todo', bits: leerPref('bits', 24), click: false, ocupado: false };
+const EXP = { que: 'mezcla', rango: 'todo', bits: leerPref('bits', 24), click: false, fundido: 0, ocupado: false };
 function abrirExportar() {
   if (!P) return;
   const hayLoop = !!(P.loop && P.loop.b - P.loop.a > 0.05);
@@ -3500,7 +3644,19 @@ function abrirExportar() {
 }
 function pintarExportar() {
   const marcar = (id, attr, v) => document.querySelectorAll(`#${id} button`).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset[attr]) === String(v) ? 'true' : 'false'));
-  marcar('expQue', 'que', EXP.que); marcar('expRango', 'rango', EXP.rango); marcar('expBits', 'bits', EXP.bits); marcar('expClick', 'click', EXP.click ? 'si' : 'no');
+  marcar('expQue', 'que', EXP.que); marcar('expRango', 'rango', EXP.rango); marcar('expBits', 'bits', EXP.bits); marcar('expClick', 'click', EXP.click ? 'si' : 'no'); marcar('expFundido', 'fundido', EXP.fundido);
+}
+document.querySelectorAll('#expFundido button').forEach((b) => b.onclick = () => { EXP.fundido = +b.dataset.fundido; pintarExportar(); });
+// Fundido de salida: el volumen baja suave hasta el final de la canción (y después, silencio)
+function aplicarFundido(buf, fin, dur) {
+  if (!dur) return;
+  dur = Math.min(dur, fin);
+  const sr = buf.sampleRate, i0 = Math.max(0, Math.round((fin - dur) * sr)), i1 = Math.min(buf.length, Math.round(fin * sr));
+  for (let c = 0; c < buf.numberOfChannels; c++) {
+    const d = buf.getChannelData(c);
+    for (let i = i0; i < i1; i++) { const x = 1 - (i - i0) / (i1 - i0); d[i] *= x * x * (3 - 2 * x) * x; }
+    d.fill(0, i1);
+  }
 }
 document.querySelectorAll('#expQue button').forEach((b) => b.onclick = () => { EXP.que = b.dataset.que; pintarExportar(); });
 document.querySelectorAll('#expRango button').forEach((b) => b.onclick = () => { if (!b.disabled) { EXP.rango = b.dataset.rango; pintarExportar(); } });
@@ -3522,11 +3678,7 @@ async function renderizar(a, b, soloPistas, conClick, alAvanzar) {
   if (conClick) {
     const u = unidad();
     for (let i = Math.ceil(a / u - 1e-6); i * u < b; i++) {
-      const x = i * u - a, tipo = tipoPulso(i);
-      const o = off.createOscillator(), gg = off.createGain();
-      o.type = 'triangle'; o.frequency.value = tipo === 2 ? 1760 : tipo === 1 ? 1320 : 1000;
-      gg.gain.setValueAtTime(0, x); gg.gain.linearRampToValueAtTime(tipo === 2 ? 0.9 : 0.55, x + 0.001); gg.gain.exponentialRampToValueAtTime(0.001, x + 0.05);
-      o.connect(gg).connect(g.click); o.start(x); o.stop(x + 0.06);
+      golpeClick(off, g.click, i * u - a, tipoPulso(i), []);
     }
   }
   const total = frames / sr;
@@ -3557,6 +3709,7 @@ async function exportar() {
   };
   if (EXP.que === 'mezcla') {
     const buf = await renderizar(a, b, null, EXP.click, (f) => { barra.style.width = `${f * 100}%`; $('expEstado').textContent = t('expMezclando', { p: Math.round(f * 100) }); });
+    aplicarFundido(buf, b - a, EXP.fundido);
     const ajuste = recortarCola(buf);
     descargar(wavDe(buf, ajuste.ganancia, EXP.bits, ajuste.largo), `${nombreBase}${enLoop ? ' (loop)' : ''}.wav`);
     $('expEstado').textContent = ajuste.ganancia < 1 ? t('expBajado', { d: (-20 * Math.log10(ajuste.ganancia)).toFixed(1) }) : t('expListo');
@@ -3571,6 +3724,7 @@ async function exportar() {
       let buf;
       try { buf = await renderizar(a, b, [p.id], false, (f) => { barra.style.width = `${((i + f) / pistas.length) * 100}%`; }); }
       finally { P.pistas.forEach((x, j) => { [x.mute, x.solo] = antes[j]; }); }
+      aplicarFundido(buf, b - a, EXP.fundido);
       const largo = Math.ceil((b - a + 0.5) * buf.sampleRate);
       descargar(wavDe(buf, 1, EXP.bits, Math.min(largo, buf.length)), `${nombreBase} - ${String(i + 1).padStart(2, '0')} ${p.nombre.replace(/[\\/:*?"<>|]+/g, '-')}.wav`);
       await new Promise((ok) => setTimeout(ok, 450));     // el navegador descarga mejor de a uno
@@ -3815,6 +3969,7 @@ function pintarTransporte() {
   $('clickBtn').setAttribute('aria-pressed', P.click ? 'true' : 'false');
   $('lcdRec').hidden = !R.grabando;
   $('lcd').classList.toggle('rec', !!R.grabando);
+  actualizarEscucha();
   E.sucio = true;
 }
 const lcdCache = {};
@@ -3898,8 +4053,32 @@ function abrirAjustes() {
   document.querySelectorAll('#ajCuenta button').forEach((b) => b.setAttribute('aria-pressed', +b.dataset.cuenta === leerPref('cuenta', 1) ? 'true' : 'false'));
   document.querySelectorAll('#ajClickModo button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.modo === leerPref('clickModo', 'siempre') ? 'true' : 'false'));
   $('ajClickVol').value = leerPref('clickVol', 60);
-  $('ajustes').showModal();
+  pintarAjEscucha();
+  document.querySelectorAll('#ajClickSonido button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.sonido === leerPref('clickSonido', 'clic') ? 'true' : 'false'));
+  if (!$('ajustes').open) $('ajustes').showModal();
 }
+function pintarAjEscucha() {
+  const m = modoEscucha();
+  document.querySelectorAll('#ajEscucha button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.escucha === m ? 'true' : 'false'));
+  $('escuchaNota').textContent = t(m === 'auto' ? 'escuchaAutoNota' : m === 'entrada' ? 'escuchaEntradaNota' : 'escuchaNoNota');
+}
+function ponerEscucha(m) {
+  guardarPref('escucha', m);
+  if (m !== 'no') guardarPref('escuchaUltimo', m);
+  if (P) prepararEscucha();
+  pintarAjEscucha();
+}
+$('escuchaBtn').onclick = () => {
+  const m = modoEscucha() === 'no' ? leerPref('escuchaUltimo', 'auto') : 'no';
+  ponerEscucha(m);
+  aviso(t(m === 'no' ? 'escuchaApagada' : 'escuchaPrendida'), 2200);
+};
+document.querySelectorAll('#ajEscucha button').forEach((b) => b.onclick = () => ponerEscucha(b.dataset.escucha));
+document.querySelectorAll('#ajClickSonido button').forEach((b) => b.onclick = () => {
+  guardarPref('clickSonido', b.dataset.sonido); abrirAjustes();
+  // Se oye cómo suena
+  asegurarAudio().then(() => { if (!G) return; const x = ctx.currentTime + 0.05, u = 0.32; sonarClick(x, 2); sonarClick(x + u, 0); sonarClick(x + 2 * u, 0); }).catch(() => {});
+});
 $('abrirAjustes').onclick = abrirAjustes;
 $('abrirAjustes2').onclick = abrirAjustes;
 $('cerrarAjustes').onclick = () => $('ajustes').close();
@@ -3909,7 +4088,49 @@ document.querySelectorAll('#ajCuenta button').forEach((b) => b.onclick = () => {
 document.querySelectorAll('#ajClickModo button').forEach((b) => b.onclick = () => { guardarPref('clickModo', b.dataset.modo); abrirAjustes(); });
 $('ajClickVol').oninput = (e) => { guardarPref('clickVol', +e.target.value); aplicarMezcla(); };
 
-/* ---------- Teclado ---------- */
+/* ---------- Teclado (al estilo Pro Tools donde se puede) ---------- */
+let portapapeles = null;
+async function pegarClip() {
+  if (!portapapeles || R.grabando) return;
+  const p = pistaDe(E.pistaSel) || P.pistas[0];
+  if (!p) return;
+  historia();
+  const c = { ...JSON.parse(JSON.stringify(portapapeles)), id: uid(), inicio: Math.max(0, posicion()) };
+  colocarClip(p, c);
+  E.sel = c.id;
+  aviso(t('pegado'), 1000);
+  await trasEditar(false);
+}
+function elegirPistaVecina(d) {
+  if (!P.pistas.length) return;
+  const i = P.pistas.findIndex((x) => x.id === E.pistaSel);
+  const j = Math.max(0, Math.min(P.pistas.length - 1, i < 0 ? 0 : i + d));
+  E.pistaSel = P.pistas[j].id;
+  // Que la pista elegida se vea
+  const y = REGLA + j * E.alto - E.scrollY;
+  if (y < REGLA) E.scrollY = j * E.alto;
+  else if (y + E.alto > E.h) E.scrollY = Math.max(0, (j + 1) * E.alto - (E.h - REGLA));
+  construirPistas(); construirMezclador();
+  document.querySelectorAll('.e-canal').forEach((x) => x.classList.toggle('elegida', x.dataset.id === E.pistaSel));
+}
+// Toca el botón R, M, S o 🎧 de la pista elegida
+function botonPista(acc) {
+  if (!E.pistaSel && P.pistas[0]) E.pistaSel = P.pistas[0].id;
+  const b = document.querySelector(`#cabMover .e-pista[data-id="${E.pistaSel}"] [data-acc="${acc}"]`);
+  if (b) b.click();
+}
+function siguienteRejilla() {
+  const bs = [...document.querySelectorAll('#rejilla button')];
+  const i = bs.findIndex((b) => b.dataset.rejilla === E.rejilla);
+  const b = bs[(i + 1) % bs.length];
+  b.click();
+  aviso(`${t('rejillaT')}: ${b.textContent.trim()}`, 1200);
+}
+function verAtajos() {
+  abrirAjustes();
+  requestAnimationFrame(() => $('atajos').scrollIntoView({ block: 'start', behavior: 'smooth' }));
+}
+const unPulso = () => unidad();
 document.addEventListener('keydown', (e) => {
   if (!P || $('estudio').hidden) return;
   if (document.querySelector('dialog[open]')) return;
@@ -3921,24 +4142,55 @@ document.addEventListener('keydown', (e) => {
   if (mod && e.code === 'KeyD') { e.preventDefault(); if (E.sel) duplicarClip(E.sel); return; }
   if (mod && e.code === 'KeyE') { e.preventDefault(); cortar(); return; }
   if (mod && e.code === 'KeyS') { e.preventDefault(); guardarYa(); aviso('✓', 800); return; }
+  if (mod && e.code === 'KeyC') { const r = E.sel && clipDe(E.sel); if (r) { e.preventDefault(); portapapeles = JSON.parse(JSON.stringify(r.clip)); aviso(t('copiado'), 1000); } return; }
+  if (mod && e.code === 'KeyV') { if (portapapeles) { e.preventDefault(); pegarClip(); } return; }
   if (mod) return;
+  // Mayúscula + letra: la pista elegida (como en Pro Tools)
+  if (e.shiftKey && !e.altKey) {
+    const acc = { KeyR: 'arm', KeyM: 'mute', KeyS: 'solo', KeyI: 'mon' }[e.code];
+    if (acc) { e.preventDefault(); botonPista(acc); return; }
+  }
+  if (e.key === '?') { e.preventDefault(); verAtajos(); return; }
+  const compas = dCompas(), paso = e.altKey ? unPulso() : compas;
   switch (e.code) {
-    case 'Space': e.preventDefault(); tocarPausar(); break;
-    case 'KeyR': e.preventDefault(); $('grabar').click(); break;
-    case 'Enter': case 'NumpadEnter': case 'Home': e.preventDefault(); alInicio(); break;
-    case 'KeyL': $('loopBtn').click(); break;
-    case 'KeyK': $('clickBtn').click(); break;
+    case 'Space': case 'Numpad0': e.preventDefault(); tocarPausar(); break;
+    case 'KeyR': case 'Numpad3': e.preventDefault(); $('grabar').click(); break;
+    case 'Enter': case 'Home': e.preventDefault(); alInicio(); break;
+    case 'NumpadEnter': case 'KeyB': e.preventDefault(); ponerMarca(posicion()); break;
+    case 'KeyL': case 'Numpad4': $('loopBtn').click(); break;
+    case 'KeyK': case 'Numpad7': $('clickBtn').click(); break;
+    case 'KeyI': $('escuchaBtn').click(); break;
     case 'KeyS': cortar(); break;
-    case 'KeyB': ponerMarca(posicion()); break;
+    case 'KeyN': agregarPista(false); aviso(t('pistaNueva'), 1000); break;
+    case 'KeyF': $('seguir').click(); aviso(t(E.seguir ? 'seguirSi' : 'seguirNo'), 1200); break;
+    case 'KeyG': siguienteRejilla(); break;
+    case 'KeyT': $('lcdTempo').click(); break;
+    case 'KeyE': abrirExportar(); break;
+    case 'Digit0': verTodo(); break;
     case 'Delete': case 'Backspace': if (E.sel) { e.preventDefault(); borrarClip(E.sel); } break;
-    case 'ArrowLeft': e.preventDefault(); irA(Math.ceil(posicion() / dCompas() - 1.001) * dCompas()); break;
-    case 'ArrowRight': e.preventDefault(); irA(Math.floor(posicion() / dCompas() + 1.001) * dCompas()); break;
+    case 'ArrowUp': e.preventDefault(); elegirPistaVecina(-1); break;
+    case 'ArrowDown': e.preventDefault(); elegirPistaVecina(1); break;
+    case 'ArrowLeft': case 'Numpad1': e.preventDefault(); irA(Math.ceil(posicion() / paso - 1.001) * paso); break;
+    case 'ArrowRight': case 'Numpad2': e.preventDefault(); irA(Math.floor(posicion() / paso + 1.001) * paso); break;
     case 'Equal': case 'NumpadAdd': zoomEn(E.zoom * 1.5, anclaZoom()); break;
     case 'Minus': case 'NumpadSubtract': zoomEn(E.zoom / 1.5, anclaZoom()); break;
     case 'Escape': E.sel = null; E.sucio = true; cerrarMenu(); break;
     case 'Tab': if (e.shiftKey) break; e.preventDefault(); aplicarPagina(E.pagina === 'pistas' ? 'mezcla' : 'pistas'); break;
   }
 });
+
+/* ---------- Cómo está tu nivel: verde casi siempre, amarillo en lo más fuerte, nunca rojo ---------- */
+const NIV = { pico: -Infinity, hasta: 0, rojoHasta: 0 };
+function pintarEstadoNivel(db, ahora) {
+  const el = $('entEstado');
+  if (!el) return;
+  if (db > -1) NIV.rojoHasta = ahora + 2500;           // si se satura, el aviso queda un rato
+  if (db > NIV.pico || ahora > NIV.hasta) { NIV.pico = db; NIV.hasta = ahora + 1500; }
+  const p = NIV.pico;
+  const [clase, k] = ahora < NIV.rojoHasta ? ['alto', 'nivelAlto'] : p < -50 ? ['', 'nivelNada'] : p < -24 ? ['', 'nivelBajo'] : p < -6 ? ['bien', 'nivelBien'] : ['fuerte', 'nivelFuerte'];
+  const txt = t(k);
+  if (el.textContent !== txt) { el.textContent = txt; el.className = 'e-ent-estado ' + clase; }
+}
 
 /* ---------- Cuadro a cuadro: arreglo, pantallas y medidores ---------- */
 let ultimoCuadro = 0, cuadroAf = 0;
@@ -3978,6 +4230,7 @@ function cuadro(ahora) {
   if (mic && $('entMedidor')) {
     const [v, pk] = nivel('ent', entDb, dt, ahora);
     dibujarMedidor($('entMedidor'), [v], pk);
+    pintarEstadoNivel(entDb, ahora);
   }
   if (ahora - cuadroAf > 60) { cuadroAf = ahora; pintarAfinador(); }
 }
