@@ -15,6 +15,8 @@ Estudio de grabación multipista en el navegador, pensado como un Pro Tools o Ab
 - **Entrada:** ganancia, ecualizador gráfico de 10 bandas con presets, compresor completo (presets como en Pro Tools, umbral, proporción, ataque, liberación y ganancia, knee, A/B y make-up automático, con medidor de cuánto aprieta), compuerta de ruido con «Medir el ruido» (umbral, cuánto baja, mantener, liberación), reverb para escucharte afinador y aviso de nivel (bajo, bien, se satura). Se elige si la toma se graba con o sin efectos.
 - **Mezclador:** por pista corte de graves, EQ de 3 bandas, compresor, envíos a reverb y delay (el delay sigue el tempo), paneo, fader y medidor. Maestro con retornos y limitador.
 - **Exportar** la mezcla o cada pista por separado, todo el proyecto o solo el loop, en WAV de 16 o 24 bits, con o sin metrónomo.
+- **Banco de sonidos propio:** 24 sonidos fabricados por la app (bombos, rumble, hats, ride, clap, percusión, acid, stabs, pad, subida, impacto). Los loops siguen el tempo del proyecto. Se oyen con ▶ y se agregan en el cabezal.
+- **Ejemplo de hard techno:** un proyecto a 155 BPM ya armado y mezclado (intro, groove, break, drop y final) con una guía paso a paso de cómo se hace.
 - **Ajustes:** español o inglés, 12 paletas, micrófono y salida de audio, cuenta, metrónomo (clic, cencerro, madera o baqueta) y latencia. Más de 30 atajos de teclado al estilo Pro Tools, incluido el teclado numérico; toca ? para verlos.
 - **Exportar:** fundido de salida al final (3, 6 o 10 s).
 

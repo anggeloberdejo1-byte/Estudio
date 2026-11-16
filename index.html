@@ -325,7 +325,8 @@
   .e-ent-pista option { color: initial; }
   .e-vol-mini { flex: 0 1 64px; min-width: 36px; height: 22px; accent-color: var(--c); }
   .e-agregar { display: flex; gap: 6px; padding: 8px; }
-  .e-agregar .e-boton { flex: 1; min-height: 34px; font-size: 12.5px; padding: 0 8px; }
+  .e-agregar .e-boton { flex: 1 1 auto; min-width: 0; min-height: 34px; font-size: 11.5px; padding: 0 5px; gap: 3px; overflow: hidden; }
+  .e-agregar .e-boton .icono { width: 15px; height: 15px; }
   .e-lienzo { position: relative; min-width: 0; overflow: hidden; touch-action: none; cursor: default; }
   .e-lienzo canvas { display: block; width: 100%; height: 100%; }
   .e-lienzo.mover { cursor: grab; }
@@ -457,6 +458,29 @@
   .e-patron-txt { font-size: 12.5px; line-height: 1.45; color: var(--e-tenue); margin: 0; }
   .e-patron-txt b { color: var(--e-texto); }
   @media (max-width: 520px) { .comp-mandos { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 14px; } }
+
+  /* Banco de sonidos y guía */
+  .banco-cat { margin: 16px 0 6px !important; text-transform: uppercase; letter-spacing: .08em; font-size: 11px !important; }
+  .banco-fila { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--e-borde); }
+  .banco-oir { width: 36px; height: 36px; flex-shrink: 0; border-radius: 50%; display: grid; place-items: center; cursor: pointer; background: var(--e-panel-2); border: 1px solid var(--e-borde); color: var(--e-texto); }
+  .banco-oir .icono { width: 16px; height: 16px; }
+  .banco-oir.sonando { background: var(--e-acento); color: var(--e-fondo); border-color: var(--e-acento); }
+  .banco-oir.cargando { opacity: .5; }
+  .banco-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+  .banco-txt b { font-size: 14px; color: var(--e-texto); }
+  .banco-txt span { font-size: 12px; color: var(--e-tenue); }
+  .banco-agregar { flex-shrink: 0; }
+  .banco-agregar .icono { width: 14px; height: 14px; }
+  .dlg-guia { width: min(640px, calc(100vw - 24px)); }
+  .guia { font-size: 14.5px; line-height: 1.55; color: var(--e-texto); }
+  .guia h3 { font-size: 15px; margin: 18px 0 6px; color: var(--e-acento); }
+  .guia h3:first-child { margin-top: 0; }
+  .guia p, .guia li { color: color-mix(in srgb, var(--e-texto) 85%, transparent); }
+  .guia ol, .guia ul { padding-left: 20px; margin: 6px 0; }
+  .guia li { margin: 4px 0; }
+  .guia kbd { font-family: var(--mono); font-size: 12px; padding: 1px 6px; border-radius: 5px; background: var(--e-pozo); border: 1px solid var(--e-borde); }
+  .guia .patron { font-family: var(--mono); font-size: 13px; background: var(--e-pozo); border-radius: 8px; padding: 8px 10px; margin: 6px 0; white-space: pre; overflow-x: auto; }
+  .ejemplo-boton { width: 100%; margin-top: 12px; justify-content: center; white-space: normal; text-align: center; min-width: 0; height: auto; min-height: 44px; padding-top: 8px; padding-bottom: 8px; line-height: 1.3; }
 
   /* Canal de entrada (tu micrófono / interfaz) */
   .e-entrada { background: linear-gradient(180deg, var(--e-panel-2), var(--e-panel)); border-radius: var(--e-r); box-shadow: 0 0 0 1px var(--e-borde); padding: 12px 16px 16px; }
@@ -657,6 +681,7 @@
           <button class="boton principal" id="crear" type="button"><svg class="icono" aria-hidden="true"><use href="#i-microfono"/></svg><span data-i18n="crear">Crear y empezar</span></button>
           <span class="boton boton-archivo"><svg class="icono" aria-hidden="true"><use href="#i-subir"/></svg><span data-i18n="crearConBase">Empezar con una base o canción</span><input type="file" id="nArchivo" accept="audio/*,video/*,.wav,.mp3,.m4a,.aac,.flac,.ogg,.aif,.aiff" data-i18n-aria="crearConBase" aria-label="Empezar con una base o canción"></span>
         </div>
+        <button class="boton ejemplo-boton" id="ejemploInicio" type="button"><svg class="icono" aria-hidden="true"><use href="#i-onda"/></svg><span data-i18n="ejemploInicioBtn">Abrir el ejemplo de hard techno (y aprende cómo se hace)</span></button>
         <p class="aviso-privado"><svg class="icono" aria-hidden="true"><use href="#i-candado"/></svg><span data-i18n="privado">Todo se guarda en tu equipo: nada se sube a internet. Funciona sin conexión.</span></p>
       </div>
     </div>
@@ -719,6 +744,7 @@
           <div class="e-cab-pistas" id="cabPistas"><div class="e-cab-mover" id="cabMover"></div></div>
           <div class="e-agregar">
             <button class="e-boton" id="nuevaPista" type="button" data-i18n-aria="pista" aria-label="Pista"><svg class="icono" aria-hidden="true"><use href="#i-mas"/></svg><span class="txt-movil" data-i18n="pista">Pista</span></button>
+            <button class="e-boton" id="abrirBanco" type="button" data-i18n-aria="bancoT" aria-label="Banco de sonidos" data-i18n-titulo="bancoT"><svg class="icono" aria-hidden="true"><use href="#i-onda"/></svg><span class="txt-movil" data-i18n="sonidosBtn">Sonidos</span></button>
             <span class="e-boton boton-archivo" role="button"><svg class="icono" aria-hidden="true"><use href="#i-subir"/></svg><span class="txt-movil" data-i18n="importar">Audio</span><input type="file" id="importar" multiple accept="audio/*,video/*,.wav,.mp3,.m4a,.aac,.flac,.ogg,.aif,.aiff" data-i18n-aria="importarT" aria-label="Importar audio"></span>
           </div>
         </div>
@@ -982,6 +1008,29 @@
   </div>
 </dialog>
 
+<dialog class="ajustes dlg-estudio" id="dlgBanco">
+  <div class="ajustes-cabeza">
+    <h2 data-i18n="bancoT">Banco de sonidos</h2>
+    <button class="boton" id="cerrarBanco" type="button" data-i18n="cerrar">Cerrar</button>
+  </div>
+  <div class="ajustes-cuerpo">
+    <p class="comp-ayuda" data-i18n="bancoSub" style="margin-top:0">Sonidos hechos por la app. Toca ▶ para oírlos y «Agregar» para ponerlos en el cabezal. Los loops siguen el tempo de tu proyecto.</p>
+    <div class="fila-botones" style="justify-content:flex-start;margin:0 0 14px">
+      <button class="boton" id="bancoGuia" type="button" data-i18n="bancoGuiaBtn">Cómo se hace un hard techno</button>
+      <button class="boton" id="bancoEjemplo" type="button" data-i18n="bancoEjemploBtn">Crear el proyecto de ejemplo</button>
+    </div>
+    <div id="bancoLista"></div>
+  </div>
+</dialog>
+
+<dialog class="ajustes dlg-estudio dlg-guia" id="dlgGuia">
+  <div class="ajustes-cabeza">
+    <h2 data-i18n="guiaT">Cómo se hace un hard techno</h2>
+    <button class="boton" id="cerrarGuia" type="button" data-i18n="entendido">Entendido</button>
+  </div>
+  <div class="ajustes-cuerpo guia" id="guiaCuerpo"></div>
+</dialog>
+
 <div class="e-menu" id="menu" role="menu" hidden></div>
 
 <!-- =====================================================================
@@ -1123,6 +1172,44 @@ const TEXTOS = {
     deshecho: 'Deshecho', rehecho: 'Rehecho', nadaDeshacer: 'No hay nada que deshacer', cortado: 'Clip cortado', normalizado: 'Clip normalizado ({d} dB)',
     sinEspacio: 'No hay espacio para guardar. Libera espacio o borra proyectos viejos.', errorT: 'Error', clicDerecho: 'Clic derecho (o mantener presionado) en un clip para más opciones',
     sinSoporte: 'Este navegador no puede grabar audio. Usa Chrome, Edge o Safari recientes.',
+    bancoT: 'Banco de sonidos', sonidosBtn: 'Sonidos', bancoSub: 'Sonidos hechos por la app (no son samples de nadie). Toca ▶ para oírlos y «Agregar» para ponerlos en el cabezal. Los loops siguen el tempo de tu proyecto.',
+    bancoGuiaBtn: 'Cómo se hace un hard techno', bancoEjemploBtn: 'Crear el proyecto de ejemplo', ejemploInicioBtn: 'Abrir el ejemplo de hard techno (y aprende cómo se hace)',
+    cat_bombos: 'Bombos y rumble', cat_platillos: 'Hats, ride y platillos', cat_percusion: 'Clap y percusión', cat_sintes: 'Sintes', cat_efectos: 'Efectos',
+    sonLoop: 'Loop de {n} compases a {bpm} BPM', sonGolpe: 'Golpe', sonOir: 'Oír', sonAgregar: 'Agregar', sonAgregarCorto: 'Agregar', sonAgregado: '«{n}» agregado en {p}',
+    s_bomboHard: 'Bombo hard', sd_bomboHard: 'corto, con golpe y saturado',
+    s_bomboDist: 'Bombo distorsionado', sd_bomboDist: 'más sucio y agresivo (estilo industrial)',
+    s_bombo909: 'Bombo clásico', sd_bombo909: 'limpio, estilo caja de ritmos de los 80',
+    s_loopBombo: 'Bombo 4x4', sd_loopBombo: 'un bombo en cada tiempo: la base de todo',
+    s_loopRumble: 'Rumble', sd_loopRumble: 'la cola grave que retumba entre bombo y bombo',
+    s_hatCerrado: 'Hat cerrado', sd_hatCerrado: 'corto y seco', s_hatAbierto: 'Hat abierto', sd_hatAbierto: 'más largo, el "tss"',
+    s_ride: 'Ride', sd_ride: 'metálico, da brillo', s_crash: 'Crash', sd_crash: 'para marcar el inicio de una parte',
+    s_loopHats: 'Hats en contratiempo', sd_loopHats: 'entre bombo y bombo: el "tum-tss"',
+    s_loopHats16: 'Hats en semicorcheas', sd_loopHats16: 'rápidos, para subir la energía',
+    s_loopRide: 'Ride en negras', sd_loopRide: 'empuja hacia adelante',
+    s_clap: 'Clap', sd_clap: 'palmas con reverb', s_rim: 'Rim', sd_rim: 'aro, seco', s_tom: 'Tom', sd_tom: 'grave y saturado',
+    s_loopClap: 'Clap en 2 y 4', sd_loopClap: 'el golpe de la mano en el 2 y el 4',
+    s_loopPerc: 'Percusión', sd_loopPerc: 'toms y rims sincopados: el rebote',
+    s_stab: 'Stab', sd_stab: 'acorde corto de sierras',
+    s_loopAcid: 'Acid', sd_loopAcid: 'línea de semicorcheas con filtro resonante',
+    s_loopStabs: 'Stabs', sd_loopStabs: 'acordes cortos con reverb y delay',
+    s_pad: 'Pad oscuro', sd_pad: 'colchón que se abre: ideal para el break',
+    s_riser: 'Subida (riser)', sd_riser: 'ruido que sube antes del drop',
+    s_impacto: 'Impacto', sd_impacto: 'golpe grande para caer en el drop', s_bajada: 'Bajada', sd_bajada: 'ruido que baja después de un golpe',
+    ejemploNombre: 'Hard techno (ejemplo)', ejemploCreando: 'Fabricando los sonidos…', ejemploPaso: 'Fabricando {i} de {n}: {s}…', ejemploListo: 'Listo: dale ▶ (Espacio) para escucharlo',
+    secIntro: 'Intro', secGroove: 'Groove', secBreak: 'Break', secDrop: 'Drop', secOutro: 'Final',
+    guiaT: 'Cómo se hace un hard techno',
+    guiaHtml: `<h3>1. Tempo y compás</h3><p>El hard techno va rápido: entre <b>150 y 160 BPM</b>, en 4/4. El ejemplo está a 155. El tempo se cambia tocando el número de BPM arriba (o la tecla <kbd>T</kbd>).</p>
+<h3>2. El bombo manda</h3><p>Un bombo en <b>cada tiempo</b> (4x4): uno, dos, tres, cuatro. Tiene que ser corto, con golpe y saturado. Es lo que más fuerte suena de toda la canción.</p>
+<div class="patron">Tiempo:  1 . . . 2 . . . 3 . . . 4 . . .
+Bombo:   X . . . X . . . X . . . X . . .
+Hat:     . . X . . . X . . . X . . . X .
+Clap:    . . . . X . . . . . . . X . . .</div>
+<h3>3. El rumble</h3><p>Es el truco del hard techno: la cola grave del bombo pasada por reverb y distorsión, que <b>retumba entre bombo y bombo</b>. Se le quitan los agudos y se aparta cuando pega el bombo para que no choquen (en el ejemplo ya viene hecho así).</p>
+<h3>4. Hats, clap y ride</h3><p>Los <b>hats en contratiempo</b> (entre cada bombo) dan el "tum-tss". El <b>clap</b> va en el 2 y el 4. El <b>ride</b> y los hats en semicorcheas suben la energía; la <b>percusión</b> sincopada da el rebote.</p>
+<h3>5. Sintes</h3><p>Pocos y agresivos: una línea <b>acid</b> (semicorcheas con filtro que chilla), <b>stabs</b> (acordes cortos con reverb) y un <b>pad</b> oscuro para el break.</p>
+<h3>6. Estructura en bloques de 8 y 16 compases</h3><ol><li><b>Intro</b> (1–16): bombo solo, después entran los hats. Así el DJ lo puede mezclar.</li><li><b>Groove</b> (17–32): entran rumble, clap, ride y percusión.</li><li><b>Break</b> (33–40): se va el bombo. Suenan el pad y el acid, y la <b>subida</b> en los últimos 4 compases.</li><li><b>Drop</b> (41–56): vuelve todo de golpe con un <b>impacto</b> y un crash.</li><li><b>Final</b> (57–64): se van quitando cosas para que el DJ salga.</li></ol><p>Las marcas de arriba muestran cada parte. Regla: <b>cada 8 compases algo entra o sale</b>.</p>
+<h3>7. La mezcla</h3><ul><li>El bombo es lo más fuerte; el rumble, un poco abajo.</li><li><b>Corte de graves</b> en todo lo que no sea bombo ni rumble, para que el grave quede limpio.</li><li>Reverb en el clap, los stabs y el pad; delay en el acid.</li><li>Compresor «Percusión con punch» en el clap y el <b>limitador</b> en el maestro.</li></ul><p>Abre el <b>Mezclador</b> (<kbd>Tab</kbd>) y mira cómo quedó cada pista.</p>
+<h3>8. Hazlo tú</h3><ol><li>Crea un proyecto nuevo a 155 BPM.</li><li>Abre <b>Sonidos</b> (abajo de las pistas) y agrega el «Bombo 4x4».</li><li>Cópialo con <kbd>⌘D</kbd> hasta llenar 16 compases.</li><li>Agrega rumble, hats y clap, pista por pista.</li><li>Haz la estructura: borra el bombo en el break (<kbd>S</kbd> corta, <kbd>⌫</kbd> borra) y pon la subida antes del drop.</li><li>Graba encima tu percusión real o tu voz con <kbd>R</kbd>.</li><li>Exporta con <kbd>E</kbd>.</li></ol>`,
     compRodilla: 'Knee', compDura: 'Dura', compSuaveR: 'Suave', compLibRapida: 'rápida (menos de 100 ms). Suelta enseguida; si es muy rápida, el volumen "bombea".', compLibMedia: 'media (100–400 ms). Pareja y natural para casi todo.', compLibLenta: 'lenta (más de 400 ms). Suave y larga; cuidado que no se monte sobre la siguiente frase o golpe.',
     compABcon: 'A/B: escuchar sin compresor', compABsin: 'A/B: estás oyendo SIN compresor', compAuto: 'Make-up automático', compAutoListo: 'Make-up: +{d} dB (lo que el compresor estaba bajando)',
     puertaT: 'Compuerta de ruido: que no se metan sonidos', puertaPrendida: 'Prendida', puertaApagada: 'Apagada', puertaMedir: 'Medir el ruido', puertaMidiendo: 'Silencio… midiendo',
@@ -1207,6 +1294,44 @@ const TEXTOS = {
     deshecho: 'Undone', rehecho: 'Redone', nadaDeshacer: 'Nothing to undo', cortado: 'Clip split', normalizado: 'Clip normalized ({d} dB)',
     sinEspacio: 'There’s no room to save. Free up space or delete old projects.', errorT: 'Error', clicDerecho: 'Right-click (or long-press) a clip for more options',
     sinSoporte: 'This browser can’t record audio. Use a recent Chrome, Edge or Safari.',
+    bancoT: 'Sound bank', sonidosBtn: 'Sounds', bancoSub: 'Sounds made by the app (not anyone’s samples). Press ▶ to hear them and “Add” to put them at the playhead. Loops follow your project’s tempo.',
+    bancoGuiaBtn: 'How to make hard techno', bancoEjemploBtn: 'Create the example project', ejemploInicioBtn: 'Open the hard techno example (and learn how it’s made)',
+    cat_bombos: 'Kicks and rumble', cat_platillos: 'Hats, ride and cymbals', cat_percusion: 'Clap and percussion', cat_sintes: 'Synths', cat_efectos: 'Effects',
+    sonLoop: '{n}-bar loop at {bpm} BPM', sonGolpe: 'One-shot', sonOir: 'Play', sonAgregar: 'Add', sonAgregarCorto: 'Add', sonAgregado: '“{n}” added on {p}',
+    s_bomboHard: 'Hard kick', sd_bomboHard: 'short, punchy and saturated',
+    s_bomboDist: 'Distorted kick', sd_bomboDist: 'dirtier and more aggressive (industrial)',
+    s_bombo909: 'Classic kick', sd_bombo909: 'clean, 80s drum machine style',
+    s_loopBombo: 'Four-on-the-floor kick', sd_loopBombo: 'a kick on every beat: the foundation',
+    s_loopRumble: 'Rumble', sd_loopRumble: 'the low tail that rumbles between kicks',
+    s_hatCerrado: 'Closed hat', sd_hatCerrado: 'short and dry', s_hatAbierto: 'Open hat', sd_hatAbierto: 'longer, the "tss"',
+    s_ride: 'Ride', sd_ride: 'metallic, adds shine', s_crash: 'Crash', sd_crash: 'marks the start of a section',
+    s_loopHats: 'Offbeat hats', sd_loopHats: 'between kicks: the "boom-tss"',
+    s_loopHats16: '16th-note hats', sd_loopHats16: 'fast, to lift the energy',
+    s_loopRide: 'Quarter-note ride', sd_loopRide: 'pushes forward',
+    s_clap: 'Clap', sd_clap: 'claps with reverb', s_rim: 'Rim', sd_rim: 'dry rimshot', s_tom: 'Tom', sd_tom: 'low and saturated',
+    s_loopClap: 'Clap on 2 and 4', sd_loopClap: 'the hand clap on 2 and 4',
+    s_loopPerc: 'Percussion', sd_loopPerc: 'syncopated toms and rims: the bounce',
+    s_stab: 'Stab', sd_stab: 'short saw chord',
+    s_loopAcid: 'Acid', sd_loopAcid: '16th-note line with a resonant filter',
+    s_loopStabs: 'Stabs', sd_loopStabs: 'short chords with reverb and delay',
+    s_pad: 'Dark pad', sd_pad: 'opening pad: perfect for the break',
+    s_riser: 'Riser', sd_riser: 'noise that rises before the drop',
+    s_impacto: 'Impact', sd_impacto: 'big hit to land the drop', s_bajada: 'Downlifter', sd_bajada: 'noise falling after a hit',
+    ejemploNombre: 'Hard techno (example)', ejemploCreando: 'Making the sounds…', ejemploPaso: 'Making {i} of {n}: {s}…', ejemploListo: 'Done: press ▶ (Space) to hear it',
+    secIntro: 'Intro', secGroove: 'Groove', secBreak: 'Break', secDrop: 'Drop', secOutro: 'Outro',
+    guiaT: 'How to make hard techno',
+    guiaHtml: `<h3>1. Tempo and time signature</h3><p>Hard techno is fast: <b>150 to 160 BPM</b>, in 4/4. The example is at 155. Change the tempo by tapping the BPM number at the top (or key <kbd>T</kbd>).</p>
+<h3>2. The kick rules</h3><p>A kick on <b>every beat</b> (four on the floor): one, two, three, four. Short, punchy and saturated. It’s the loudest thing in the track.</p>
+<div class="patron">Beat:    1 . . . 2 . . . 3 . . . 4 . . .
+Kick:    X . . . X . . . X . . . X . . .
+Hat:     . . X . . . X . . . X . . . X .
+Clap:    . . . . X . . . . . . . X . . .</div>
+<h3>3. The rumble</h3><p>The hard techno trick: the kick’s low tail through reverb and distortion, <b>rumbling between kicks</b>. Highs are removed and it ducks when the kick hits so they don’t clash (the example already does this).</p>
+<h3>4. Hats, clap and ride</h3><p><b>Offbeat hats</b> (between each kick) give the "boom-tss". The <b>clap</b> goes on 2 and 4. The <b>ride</b> and 16th-note hats lift the energy; syncopated <b>percussion</b> adds bounce.</p>
+<h3>5. Synths</h3><p>Few and aggressive: an <b>acid</b> line (16ths with a squealing filter), <b>stabs</b> (short chords with reverb) and a dark <b>pad</b> for the break.</p>
+<h3>6. Structure in 8- and 16-bar blocks</h3><ol><li><b>Intro</b> (1–16): kick alone, then hats come in, so a DJ can mix it.</li><li><b>Groove</b> (17–32): rumble, clap, ride and percussion come in.</li><li><b>Break</b> (33–40): the kick drops out. Pad and acid play, with the <b>riser</b> in the last 4 bars.</li><li><b>Drop</b> (41–56): everything slams back with an <b>impact</b> and a crash.</li><li><b>Outro</b> (57–64): elements leave so the DJ can mix out.</li></ol><p>The markers at the top show each section. Rule: <b>every 8 bars something comes in or out</b>.</p>
+<h3>7. The mix</h3><ul><li>The kick is loudest; the rumble a bit below.</li><li><b>Low cut</b> on everything except kick and rumble, so the low end stays clean.</li><li>Reverb on clap, stabs and pad; delay on the acid.</li><li>“Punchy percussion” compressor on the clap and the <b>limiter</b> on the master.</li></ul><p>Open the <b>Mixer</b> (<kbd>Tab</kbd>) to see each track’s settings.</p>
+<h3>8. Make your own</h3><ol><li>Create a new project at 155 BPM.</li><li>Open <b>Sounds</b> (under the tracks) and add the kick loop.</li><li>Duplicate it with <kbd>⌘D</kbd> until you fill 16 bars.</li><li>Add rumble, hats and clap, track by track.</li><li>Build the structure: remove the kick in the break (<kbd>S</kbd> splits, <kbd>⌫</kbd> deletes) and put the riser before the drop.</li><li>Record your real percussion or vocals on top with <kbd>R</kbd>.</li><li>Export with <kbd>E</kbd>.</li></ol>`,
     compRodilla: 'Knee', compDura: 'Hard', compSuaveR: 'Soft', compLibRapida: 'fast (under 100 ms). Lets go right away; too fast and the volume "pumps".', compLibMedia: 'medium (100–400 ms). Even and natural for most things.', compLibLenta: 'slow (over 400 ms). Smooth and long; make sure it doesn’t spill into the next phrase or hit.',
     compABcon: 'A/B: hear without compressor', compABsin: 'A/B: you’re hearing it WITHOUT compressor', compAuto: 'Auto make-up', compAutoListo: 'Make-up: +{d} dB (what the compressor was taking away)',
     puertaT: 'Noise gate: keep room sounds out', puertaPrendida: 'On', puertaApagada: 'Off', puertaMedir: 'Measure the noise', puertaMidiendo: 'Quiet… measuring',
@@ -4131,6 +4256,345 @@ function wavDe(buf, ganancia = 1, bits = 16, n = buf.length) {
   }
   return new Blob([vista.buffer], { type: 'audio/wav' });
 }
+
+/* =====================================================================
+ * Banco de sonidos propio: todo se fabrica aquí mismo con osciladores, ruido,
+ * filtros y distorsión (no usa samples de nadie). Los loops siguen el tempo del proyecto.
+ * ===================================================================== */
+const SON = {};   // utilidades de síntesis (en un OfflineAudioContext)
+SON.ruido = (c, seg = 2) => {
+  const b = c.createBuffer(1, Math.round(c.sampleRate * seg), c.sampleRate), d = b.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  return b;
+};
+SON.curva = (k) => { const n = 2048, cu = new Float32Array(n); for (let i = 0; i < n; i++) { const x = (i / (n - 1)) * 2 - 1; cu[i] = Math.tanh(k * x) / Math.tanh(k); } return cu; };
+SON.dist = (c, k) => { const w = c.createWaveShaper(); w.curve = SON.curva(k); w.oversample = '2x'; return w; };
+SON.filtro = (c, tipo, f, q = 0.7) => { const b = c.createBiquadFilter(); b.type = tipo; b.frequency.value = f; b.Q.value = q; return b; };
+SON.gan = (c, v = 1) => { const g = c.createGain(); g.gain.value = v; return g; };
+// Reverb: respuesta de sala hecha con ruido que se apaga
+SON.reverb = (c, seg = 1.6, caida = 3) => {
+  const n = Math.round(c.sampleRate * seg), b = c.createBuffer(2, n, c.sampleRate);
+  for (let ch = 0; ch < 2; ch++) { const d = b.getChannelData(ch); for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, caida); }
+  const cv = c.createConvolver(); cv.buffer = b; return cv;
+};
+SON.fuenteRuido = (c, t, dur, buf) => { const s = c.createBufferSource(); s.buffer = buf || SON.ruido(c, Math.min(4, dur + 0.1)); s.start(t); s.stop(t + dur); return s; };
+// Envolvente: sube en 'at' y cae con constante 'dec'
+SON.env = (g, t, pico, dec, at = 0.001) => { g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(pico, t + at); g.gain.setTargetAtTime(0, t + at, dec); };
+const NOTA = (n) => 440 * Math.pow(2, (n - 69) / 12);   // número MIDI → Hz
+
+/* ---------- Instrumentos (cada uno toca un golpe en el tiempo t) ---------- */
+SON.bombo = (c, dest, t, o = {}) => {
+  const { f0 = 50, fIni = 340, caidaTono = 0.03, dec = 0.07, mantener = 0.045, drive = 5, click = 0.5, vol = 1 } = o;
+  const os = c.createOscillator(), g = SON.gan(c, 0), sh = SON.dist(c, drive), lp = SON.filtro(c, 'lowpass', 7000);
+  os.frequency.setValueAtTime(fIni, t); os.frequency.setTargetAtTime(f0, t, caidaTono);
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + 0.002); g.gain.setValueAtTime(vol, t + mantener); g.gain.setTargetAtTime(0, t + mantener, dec);
+  os.connect(g).connect(sh).connect(lp).connect(dest); os.start(t); os.stop(t + mantener + dec * 7);
+  if (click > 0) { const n = SON.fuenteRuido(c, t, 0.02), hp = SON.filtro(c, 'highpass', 1800), gc = SON.gan(c, 0); SON.env(gc, t, click * vol, 0.004); n.connect(hp).connect(gc).connect(dest); }
+};
+SON.hat = (c, dest, t, dec = 0.03, vol = 0.6) => {
+  const n = SON.fuenteRuido(c, t, dec * 7), hp = SON.filtro(c, 'highpass', 7200), bp = SON.filtro(c, 'bandpass', 10500, 0.6), g = SON.gan(c, 0);
+  SON.env(g, t, vol, dec); n.connect(hp).connect(bp).connect(g).connect(dest);
+};
+SON.metal = (c, dest, t, dec, vol, fHp = 6000) => {
+  // Seis ondas cuadradas desafinadas entre sí: el brillo metálico de platillos y rides
+  const g = SON.gan(c, 0), bp = SON.filtro(c, 'bandpass', 9000, 0.5), hp = SON.filtro(c, 'highpass', fHp);
+  for (const f of [205.3, 304.4, 369.6, 522.7, 540, 800]) { const o = c.createOscillator(); o.type = 'square'; o.frequency.value = f * 1.7; o.connect(bp); o.start(t); o.stop(t + dec * 7); }
+  bp.connect(hp).connect(g).connect(dest); SON.env(g, t, vol, dec);
+};
+SON.clap = (c, dest, t, vol = 1, rev = null) => {
+  const bp = SON.filtro(c, 'bandpass', 1150, 1.1), g = SON.gan(c, 0), n = SON.fuenteRuido(c, t, 0.5);
+  n.connect(bp).connect(g).connect(dest);
+  if (rev) g.connect(rev);
+  // Tres palmas casi juntas y la cola
+  [0, 0.011, 0.023].forEach((d) => { g.gain.setValueAtTime(vol, t + d); g.gain.setTargetAtTime(0.05 * vol, t + d + 0.001, 0.003); });
+  g.gain.setValueAtTime(vol * 0.8, t + 0.034); g.gain.setTargetAtTime(0, t + 0.034, 0.06);
+};
+SON.tom = (c, dest, t, f = 160, vol = 0.8) => {
+  const o = c.createOscillator(), g = SON.gan(c, 0), sh = SON.dist(c, 3);
+  o.frequency.setValueAtTime(f * 1.6, t); o.frequency.setTargetAtTime(f, t, 0.02);
+  SON.env(g, t, vol, 0.09); o.connect(g).connect(sh).connect(dest); o.start(t); o.stop(t + 0.7);
+};
+SON.rim = (c, dest, t, vol = 0.6) => {
+  const o = c.createOscillator(), g = SON.gan(c, 0), bp = SON.filtro(c, 'bandpass', 1800, 3);
+  o.type = 'triangle'; o.frequency.value = 1750; SON.env(g, t, vol, 0.012);
+  o.connect(bp).connect(g).connect(dest); o.start(t); o.stop(t + 0.1);
+  const n = SON.fuenteRuido(c, t, 0.05), hp = SON.filtro(c, 'highpass', 3000), gn = SON.gan(c, 0); SON.env(gn, t, vol * 0.5, 0.008); n.connect(hp).connect(gn).connect(dest);
+};
+// Sinte de sierras desafinadas con filtro que se abre y se cierra
+SON.sierras = (c, dest, t, notas, dur, o = {}) => {
+  const { fIni = 3000, fFin = 400, dec = 0.12, q = 2, vol = 0.5, desaf = 12, ataque = 0.004 } = o;
+  const lp = SON.filtro(c, 'lowpass', fIni, q), g = SON.gan(c, 0);
+  lp.frequency.setValueAtTime(fIni, t); lp.frequency.setTargetAtTime(fFin, t, dec);
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + ataque); g.gain.setValueAtTime(vol, t + Math.max(ataque, dur - 0.02)); g.gain.linearRampToValueAtTime(0, t + dur + 0.05);
+  for (const n of notas) for (const d of [-desaf, 0, desaf]) { const os = c.createOscillator(); os.type = 'sawtooth'; os.frequency.value = NOTA(n); os.detune.value = d; const gg = SON.gan(c, 1 / (notas.length * 3)); os.connect(gg).connect(lp); os.start(t); os.stop(t + dur + 0.1); }
+  lp.connect(g).connect(dest);
+  return g;
+};
+
+/* ---------- Patrones de loop (b = inicio del compás, u = un pulso) ---------- */
+const golpesEn = (compases, u, cada, desde = 0) => { const r = []; for (let k = 0; k < compases * 4 / cada; k++) r.push((desde + k * cada) * u); return r; };
+
+const SONIDOS = [
+  // --- Bombos ---
+  { id: 'bomboHard', cat: 'bombos', tipo: 'golpe', dur: 0.9, hacer: (c, d) => SON.bombo(c, d, 0.01, { f0: 50, drive: 6 }) },
+  { id: 'bomboDist', cat: 'bombos', tipo: 'golpe', dur: 1.0, hacer: (c, d) => SON.bombo(c, d, 0.01, { f0: 46, fIni: 420, drive: 14, dec: 0.1, click: 0.8 }) },
+  { id: 'bombo909', cat: 'bombos', tipo: 'golpe', dur: 0.8, hacer: (c, d) => SON.bombo(c, d, 0.01, { f0: 55, fIni: 220, drive: 1.5, dec: 0.1, mantener: 0.03, click: 0.35 }) },
+  { id: 'loopBombo', cat: 'bombos', tipo: 'loop', compases: 4, hacer: (c, d, s) => golpesEn(s.compases, s.u, 1).forEach((x) => SON.bombo(c, d, x, { f0: 50, drive: 6 })) },
+  { id: 'loopRumble', cat: 'bombos', tipo: 'loop', compases: 4, hacer: (c, d, s) => {
+    // El rumble: la cola grave del bombo pasada por reverb, filtrada y "esquivando" cada golpe
+    const rev = SON.reverb(c, 1.4, 2.2), lp = SON.filtro(c, 'lowpass', 150, 1.2), hp = SON.filtro(c, 'highpass', 32), sh = SON.dist(c, 9), duck = SON.gan(c, 0), g = SON.gan(c, 2.5);
+    const seco = SON.gan(c, 1);
+    golpesEn(s.compases, s.u, 1).forEach((x) => SON.bombo(c, seco, x, { f0: 48, drive: 4, click: 0, dec: 0.12 }));
+    seco.connect(rev).connect(sh).connect(lp).connect(hp).connect(duck).connect(g).connect(d);
+    golpesEn(s.compases, s.u, 1).forEach((x) => { duck.gain.setValueAtTime(0, x); duck.gain.linearRampToValueAtTime(1, x + s.u * 0.3); duck.gain.setValueAtTime(1, x + s.u * 0.85); duck.gain.linearRampToValueAtTime(0, x + s.u * 0.99); });
+  } },
+  // --- Platillos ---
+  { id: 'hatCerrado', cat: 'platillos', tipo: 'golpe', dur: 0.3, hacer: (c, d) => SON.hat(c, d, 0.005, 0.03, 0.8) },
+  { id: 'hatAbierto', cat: 'platillos', tipo: 'golpe', dur: 0.8, hacer: (c, d) => SON.hat(c, d, 0.005, 0.16, 0.8) },
+  { id: 'ride', cat: 'platillos', tipo: 'golpe', dur: 2.0, hacer: (c, d) => SON.metal(c, d, 0.005, 0.35, 0.6) },
+  { id: 'crash', cat: 'platillos', tipo: 'golpe', dur: 3.0, estereo: true, hacer: (c, d) => { const r = SON.reverb(c, 2, 2); SON.metal(c, d, 0.005, 0.6, 0.5, 4000); SON.hat(c, d, 0.005, 0.5, 0.5); SON.hat(c, r, 0.005, 0.4, 0.3); r.connect(d); } },
+  { id: 'loopHats', cat: 'platillos', tipo: 'loop', compases: 4, hacer: (c, d, s) => golpesEn(s.compases, s.u, 1, 0.5).forEach((x) => SON.hat(c, d, x, 0.07, 0.85)) },
+  { id: 'loopHats16', cat: 'platillos', tipo: 'loop', compases: 4, hacer: (c, d, s) => golpesEn(s.compases, s.u, 0.25).forEach((x, i) => SON.hat(c, d, x, i % 2 ? 0.025 : 0.018, i % 4 === 2 ? 0.75 : 0.4)) },
+  { id: 'loopRide', cat: 'platillos', tipo: 'loop', compases: 4, hacer: (c, d, s) => golpesEn(s.compases, s.u, 1).forEach((x) => SON.metal(c, d, x, 0.22, 0.45)) },
+  // --- Percusión ---
+  { id: 'clap', cat: 'percusion', tipo: 'golpe', dur: 1.2, estereo: true, hacer: (c, d) => { const r = SON.reverb(c, 1, 3), gr = SON.gan(c, 0.35); r.connect(gr).connect(d); SON.clap(c, d, 0.005, 1, r); } },
+  { id: 'rim', cat: 'percusion', tipo: 'golpe', dur: 0.3, hacer: (c, d) => SON.rim(c, d, 0.005, 0.8) },
+  { id: 'tom', cat: 'percusion', tipo: 'golpe', dur: 0.8, hacer: (c, d) => SON.tom(c, d, 0.005, 150, 0.9) },
+  { id: 'loopClap', cat: 'percusion', tipo: 'loop', compases: 4, estereo: true, hacer: (c, d, s) => { const r = SON.reverb(c, 1, 3), gr = SON.gan(c, 0.3); r.connect(gr).connect(d); golpesEn(s.compases, s.u, 2, 1).forEach((x) => SON.clap(c, d, x, 1, r)); } },
+  { id: 'loopPerc', cat: 'percusion', tipo: 'loop', compases: 4, hacer: (c, d, s) => {
+    // Toms y rims sincopados (lo que le da el "rebote" al groove)
+    const pat = [[0.75, 'r'], [1.5, 't', 190], [2.25, 'r'], [2.75, 't', 150], [3.5, 'r'], [3.75, 't', 120]];
+    for (let k = 0; k < s.compases; k++) for (const [p, ti, f] of pat) { const x = (k * 4 + p) * s.u; ti === 'r' ? SON.rim(c, d, x, 0.6) : SON.tom(c, d, x, f, 0.7); }
+  } },
+  // --- Sintes ---
+  { id: 'stab', cat: 'sintes', tipo: 'golpe', dur: 2.0, estereo: true, hacer: (c, d) => { const r = SON.reverb(c, 1.8, 2.5), gr = SON.gan(c, 0.4); r.connect(gr).connect(d); const g = SON.sierras(c, d, 0.005, [45, 57, 60, 64], 0.22, { fIni: 4000, fFin: 300, dec: 0.08, vol: 0.9 }); g.connect(r); } },
+  { id: 'loopAcid', cat: 'sintes', tipo: 'loop', compases: 4, hacer: (c, d, s) => {
+    // Línea acid: sierra por un filtro con mucha resonancia que se abre en cada nota
+    const pat = [33, 33, 45, 33, 36, 33, 31, 33, 33, 39, 33, 45, 33, 31, 36, 33];
+    const acento = [1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0];
+    const os = c.createOscillator(), lp = SON.filtro(c, 'lowpass', 400, 16), g = SON.gan(c, 0), sh = SON.dist(c, 2.5), hp = SON.filtro(c, 'highpass', 60);
+    os.type = 'sawtooth'; os.connect(lp).connect(g).connect(sh).connect(hp).connect(d);
+    const paso = s.u / 4, total = s.compases * 16;
+    for (let i = 0; i < total; i++) {
+      const x = i * paso, k = i % 16, n = pat[k] + (Math.floor(i / 16) % 4 === 3 && k > 11 ? 5 : 0), a = acento[k];
+      os.frequency.setValueAtTime(NOTA(n), x);
+      lp.frequency.setValueAtTime(a ? 2600 : 1300, x); lp.frequency.setTargetAtTime(260, x, a ? 0.07 : 0.045);
+      g.gain.setValueAtTime(a ? 0.75 : 0.5, x); g.gain.setValueAtTime(0, x + paso * 0.72);
+    }
+    os.start(0); os.stop(total * paso + 0.1);
+  } },
+  { id: 'loopStabs', cat: 'sintes', tipo: 'loop', compases: 4, estereo: true, hacer: (c, d, s) => {
+    const r = SON.reverb(c, 1.8, 2.5), gr = SON.gan(c, 0.45); r.connect(gr).connect(d);
+    for (let k = 0; k < s.compases; k++) for (const p of [0.5, 1.75, 3]) { const g = SON.sierras(c, d, (k * 4 + p) * s.u, k % 2 ? [43, 55, 58, 62] : [45, 57, 60, 64], 0.16, { fIni: 3500, fFin: 300, dec: 0.06, vol: 0.85 }); g.connect(r); }
+  } },
+  { id: 'pad', cat: 'sintes', tipo: 'loop', compases: 4, estereo: true, hacer: (c, d, s) => {
+    // Colchón oscuro para el break: se abre despacio
+    const largo = s.compases * 4 * s.u, r = SON.reverb(c, 3, 1.8), gr = SON.gan(c, 0.6); r.connect(gr).connect(d);
+    const g = SON.sierras(c, d, 0, [45, 52, 57, 60], largo, { fIni: 300, fFin: 1800, dec: largo / 2, q: 1, vol: 0.6, desaf: 18, ataque: 0.8 });
+    g.connect(r);
+  } },
+  // --- Efectos ---
+  { id: 'riser', cat: 'efectos', tipo: 'loop', compases: 4, estereo: true, hacer: (c, d, s) => {
+    // Subida: ruido que se abre y una sierra que sube de tono, cada vez más fuerte
+    const largo = s.compases * 4 * s.u, t0 = s.compasesTotal > s.compases ? (s.compasesTotal - s.compases) * 4 * s.u : 0;
+    const n = SON.fuenteRuido(c, t0, largo), bp = SON.filtro(c, 'bandpass', 300, 2), g = SON.gan(c, 0), r = SON.reverb(c, 2, 2);
+    bp.frequency.setValueAtTime(300, t0); bp.frequency.exponentialRampToValueAtTime(9000, t0 + largo);
+    g.gain.setValueAtTime(0.001, t0); g.gain.exponentialRampToValueAtTime(0.9, t0 + largo - 0.02); g.gain.linearRampToValueAtTime(0, t0 + largo);
+    n.connect(bp).connect(g).connect(d); g.connect(r).connect(d);
+    const os = c.createOscillator(), go = SON.gan(c, 0); os.type = 'sawtooth';
+    os.frequency.setValueAtTime(110, t0); os.frequency.exponentialRampToValueAtTime(880, t0 + largo);
+    go.gain.setValueAtTime(0.001, t0); go.gain.exponentialRampToValueAtTime(0.25, t0 + largo - 0.02); go.gain.linearRampToValueAtTime(0, t0 + largo);
+    os.connect(go).connect(d); os.start(t0); os.stop(t0 + largo);
+  } },
+  { id: 'impacto', cat: 'efectos', tipo: 'golpe', dur: 3.5, estereo: true, hacer: (c, d) => {
+    const r = SON.reverb(c, 3, 2), gr = SON.gan(c, 0.5); r.connect(gr).connect(d);
+    SON.bombo(c, d, 0.005, { f0: 38, fIni: 200, dec: 0.6, mantener: 0.1, drive: 4, click: 0.6, vol: 1 });
+    const n = SON.fuenteRuido(c, 0.005, 2.5), lp = SON.filtro(c, 'lowpass', 5000), g = SON.gan(c, 0); SON.env(g, 0.005, 0.6, 0.5);
+    n.connect(lp).connect(g).connect(d); g.connect(r);
+  } },
+  { id: 'bajada', cat: 'efectos', tipo: 'golpe', dur: 2.5, estereo: true, hacer: (c, d) => {
+    const n = SON.fuenteRuido(c, 0.005, 2.2), bp = SON.filtro(c, 'bandpass', 8000, 1.5), g = SON.gan(c, 0), r = SON.reverb(c, 2, 2);
+    bp.frequency.setValueAtTime(8000, 0.005); bp.frequency.exponentialRampToValueAtTime(200, 2.1); SON.env(g, 0.005, 0.7, 0.7, 0.01);
+    n.connect(bp).connect(g).connect(d); g.connect(r).connect(d);
+  } },
+];
+const SONIDO = Object.fromEntries(SONIDOS.map((x) => [x.id, x]));
+
+// Fabrica un sonido al tempo dado. Los loops se tocan con un compás de más al principio
+// (y se descarta) para que las colas del final suenen también al inicio: así empalman sin corte.
+async function fabricarSonido(def, bpm) {
+  await asegurarAudio();
+  const sr = ctx.sampleRate, u = 60 / bpm, compas = 4 * u;
+  const ch = def.estereo ? 2 : 1;
+  let largo, desde = 0, s;
+  if (def.tipo === 'loop') {
+    const total = def.compases + 1;
+    s = { u, compases: total, compasesTotal: total };
+    largo = Math.round(total * compas * sr); desde = Math.round(compas * sr);
+  } else { s = { u, compases: 1 }; largo = Math.round(def.dur * sr); }
+  const c = new OfflineAudioContext(ch, largo, sr);
+  const salida = SON.gan(c, 1);
+  salida.connect(c.destination);
+  def.hacer(c, salida, s);
+  const buf = await c.startRendering();
+  const canales = [];
+  for (let i = 0; i < ch; i++) canales.push(buf.getChannelData(i).slice(desde));
+  // Al mismo nivel todos (pico en −1 dB) para mezclar parejo
+  let pico = 0;
+  for (const d of canales) for (let i = 0; i < d.length; i++) { const v = d[i] < 0 ? -d[i] : d[i]; if (v > pico) pico = v; }
+  if (pico > 0) { const k = 0.89 / pico; for (const d of canales) for (let i = 0; i < d.length; i++) d[i] *= k; }
+  // Los golpes: un fundido cortito al final para que no hagan clic
+  if (def.tipo !== 'loop') { const n = Math.min(canales[0].length, Math.round(sr * 0.01)); for (const d of canales) for (let i = 0; i < n; i++) d[d.length - 1 - i] *= i / n; }
+  return { canales, sr };
+}
+
+/* ---------- Ventana del banco de sonidos ---------- */
+const BANCO = { cache: new Map(), sonando: null };
+const CATS = ['bombos', 'platillos', 'percusion', 'sintes', 'efectos'];
+function abrirBanco() {
+  const caja = $('bancoLista');
+  caja.innerHTML = '';
+  for (const cat of CATS) {
+    const h = document.createElement('p'); h.className = 'settings-section-title banco-cat'; h.textContent = t('cat_' + cat);
+    caja.appendChild(h);
+    for (const def of SONIDOS.filter((x) => x.cat === cat)) {
+      const fila = document.createElement('div');
+      fila.className = 'banco-fila';
+      const desc = def.tipo === 'loop' ? t('sonLoop', { n: def.compases, bpm: P ? Math.round(P.bpm) : '' }) : t('sonGolpe');
+      fila.innerHTML = `<button type="button" class="banco-oir" aria-label="${t('sonOir')} ${t('s_' + def.id)}"><svg class="icono" aria-hidden="true"><use href="#i-play"/></svg></button>
+        <div class="banco-txt"><b>${t('s_' + def.id)}</b><span>${desc} · ${t('sd_' + def.id)}</span></div>
+        <button type="button" class="e-chip banco-agregar" aria-label="${t('sonAgregar')} ${t('s_' + def.id)}"><svg class="icono" aria-hidden="true"><use href="#i-mas"/></svg>${t('sonAgregarCorto')}</button>`;
+      fila.querySelector('.banco-oir').onclick = (e) => oirSonido(def, e.currentTarget);
+      fila.querySelector('.banco-agregar').onclick = (e) => agregarSonido(def, e.currentTarget);
+      caja.appendChild(fila);
+    }
+  }
+  $('dlgBanco').showModal();
+}
+async function bufferDe(def) {
+  const bpm = P ? P.bpm : 150, clave = def.id + '@' + bpm;
+  if (BANCO.cache.has(clave)) return BANCO.cache.get(clave);
+  const r = await fabricarSonido(def, bpm);
+  const buf = new AudioBuffer({ numberOfChannels: r.canales.length, length: r.canales[0].length, sampleRate: r.sr });
+  r.canales.forEach((d, i) => buf.copyToChannel(d, i));
+  const x = { buf, canales: r.canales, sr: r.sr };
+  BANCO.cache.set(clave, x);
+  return x;
+}
+function pararOir() {
+  if (BANCO.sonando) { try { BANCO.sonando.src.stop(); } catch (e) {} BANCO.sonando.boton.classList.remove('sonando'); BANCO.sonando = null; }
+}
+async function oirSonido(def, boton) {
+  const era = BANCO.sonando && BANCO.sonando.boton === boton;
+  pararOir();
+  if (era) return;
+  boton.classList.add('cargando');
+  const x = await bufferDe(def);
+  boton.classList.remove('cargando');
+  const src = ctx.createBufferSource(), g = ctx.createGain();
+  src.buffer = x.buf; g.gain.value = 0.8;
+  src.connect(g).connect(ctx.destination);
+  src.start();
+  boton.classList.add('sonando');
+  BANCO.sonando = { src, boton };
+  src.onended = () => { if (BANCO.sonando && BANCO.sonando.src === src) pararOir(); };
+}
+// Agrega el sonido en el cabezal: en la pista elegida si se llama igual, si no en una pista nueva con su nombre
+async function agregarSonido(def, boton) {
+  if (!P) return;
+  boton.disabled = true;
+  try {
+    const x = await bufferDe(def);
+    const nombre = t('s_' + def.id);
+    historia();
+    const id = await nuevoAudio(x.canales.map((d) => d.slice()), x.sr, nombre);
+    let p = pistaDe(E.pistaSel);
+    if (!p || p.nombre !== nombre) p = agregarPista(true, nombre);
+    const largo = x.canales[0].length / x.sr;
+    const inicio = ajustar(Math.max(0, P.cursor));
+    colocarClip(p, { id: uid(), audio: id, inicio, offset: 0, largo, ganancia: 0, fadeIn: 0.002, fadeOut: def.tipo === 'loop' ? 0.002 : 0.004, nombre });
+    if (def.tipo === 'loop') P.cursor = inicio + largo;     // el siguiente queda pegado detrás
+    await trasEditar(true);
+    aviso(t('sonAgregado', { n: nombre, p: p.nombre }), 1800);
+  } finally { boton.disabled = false; }
+}
+$('dlgBanco').addEventListener('close', pararOir);
+$('dlgBanco').addEventListener('click', (e) => { if (e.target === $('dlgBanco')) $('dlgBanco').close(); });
+$('cerrarBanco').onclick = () => $('dlgBanco').close();
+$('bancoGuia').onclick = () => { $('dlgBanco').close(); abrirGuia(); };
+$('bancoEjemplo').onclick = () => { $('dlgBanco').close(); crearEjemploTechno(); };
+$('abrirBanco').onclick = () => { asegurarAudio().catch(() => {}); abrirBanco(); };
+
+/* =====================================================================
+ * Proyecto de ejemplo: hard techno a 155 BPM, ya armado y mezclado
+ * ===================================================================== */
+// Compases (empezando en 0) donde suena cada loop de 4 compases
+const EJEMPLO = {
+  bpm: 155,
+  secciones: [['secIntro', 0], ['secGroove', 16], ['secBreak', 32], ['secDrop', 40], ['secOutro', 56]],
+  pistas: [
+    { son: 'loopBombo', partes: [[0, 32], [40, 64]], vol: -1, mix: { hpf: false } },
+    { son: 'loopRumble', partes: [[16, 32], [40, 56]], vol: -5 },
+    { son: 'loopClap', partes: [[16, 32], [44, 64]], vol: -7, mix: { hpf: true, rev: 0.25, cmp: 'percusion' } },
+    { son: 'loopHats', partes: [[8, 32], [40, 64]], vol: -11, mix: { hpf: true, pan: 0.12 } },
+    { son: 'loopHats16', partes: [[24, 32], [48, 56]], vol: -16, mix: { hpf: true, pan: -0.25 } },
+    { son: 'loopRide', partes: [[16, 32], [40, 56]], vol: -16, mix: { hpf: true, pan: -0.15 } },
+    { son: 'loopPerc', partes: [[24, 32], [48, 64]], vol: -14, mix: { hpf: true, pan: 0.3, rev: 0.15 } },
+    { son: 'loopAcid', partes: [[32, 40], [48, 56]], vol: -10, mix: { hpf: true, del: 0.25, cmp: 'suave' } },
+    { son: 'loopStabs', partes: [[40, 48]], vol: -11, mix: { hpf: true, rev: 0.3, del: 0.15 } },
+    { son: 'pad', partes: [[32, 40]], vol: -10, mix: { hpf: true, rev: 0.35 } },
+    { son: 'riser', partes: [[36, 40]], vol: -8, mix: { hpf: true } },
+    { son: 'impacto', golpes: [40], vol: -6, mix: { rev: 0.2 } },
+    { son: 'crash', golpes: [16, 40, 56], vol: -12, mix: { hpf: true } },
+  ],
+};
+async function crearEjemploTechno() {
+  await asegurarAudio();
+  if (P) await cerrarProyecto();
+  const pr = proyectoNuevo(t('ejemploNombre'), EJEMPLO.bpm, 4, 4);
+  pr.click = false;
+  await bdHacer('proyectos', 'readwrite', (s) => s.put(pr));
+  await abrirProyecto(pr.id);
+  aviso(t('ejemploCreando'), 60000);
+  const compas = (60 / P.bpm) * 4;
+  try {
+    for (let i = 0; i < EJEMPLO.pistas.length; i++) {
+      const e = EJEMPLO.pistas[i], def = SONIDO[e.son], nombre = t('s_' + def.id);
+      aviso(t('ejemploPaso', { i: i + 1, n: EJEMPLO.pistas.length, s: nombre }), 60000);
+      const x = await bufferDe(def);
+      const id = await nuevoAudio(x.canales.map((d) => d.slice()), x.sr, nombre);
+      const p = pistaNueva(nombre, i % C.colores.length);
+      const m = e.mix || {};
+      p.vol = dbAGan(e.vol); p.pan = m.pan || 0; p.hpf = !!m.hpf; p.rev = m.rev || 0; p.del = m.del || 0;
+      if (m.cmp) p.cmp = { ...COMP_PRESETS[m.cmp], preset: m.cmp };
+      const largo = x.canales[0].length / x.sr;
+      const poner = (bar) => p.clips.push({ id: uid(), audio: id, inicio: bar * compas, offset: 0, largo, ganancia: 0, fadeIn: 0.002, fadeOut: 0.004, nombre });
+      for (const [a, b] of e.partes || []) for (let bar = a; bar < b; bar += def.compases) poner(bar);
+      for (const bar of e.golpes || []) poner(bar);
+      P.pistas.push(p);
+    }
+    P.marcas = EJEMPLO.secciones.map(([k, bar]) => ({ id: uid(), t: bar * compas, nombre: t(k) }));
+    P.maestro.limitador = true;
+    E.pistaSel = P.pistas[0].id;
+    H.atras = []; H.adelante = [];
+    await trasEditar(true);
+    await guardarYa();
+    verTodo();
+    aviso(t('ejemploListo'), 4000);
+    abrirGuia();
+  } catch (err) {
+    aviso(`${t('errorT')}: ${err.message}`, 5000);
+  }
+}
+
+/* ---------- Guía: cómo se hace un hard techno ---------- */
+function abrirGuia() {
+  $('guiaCuerpo').innerHTML = t('guiaHtml');
+  $('dlgGuia').showModal();
+}
+$('cerrarGuia').onclick = () => $('dlgGuia').close();
+$('dlgGuia').addEventListener('click', (e) => { if (e.target === $('dlgGuia')) $('dlgGuia').close(); });
+$('ejemploInicio').onclick = () => crearEjemploTechno().catch((e) => aviso(e.message));
 
 /* =====================================================================
  * Proyectos: lista, crear, abrir, duplicar, borrar
