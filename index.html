@@ -446,6 +446,10 @@
   .e-comp-chip { min-height: 22px; padding: 0 8px; font-size: 10.5px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .e-fx-col { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
   .e-ent-puerta { grid-column: 1 / -1; border-top: 1px solid var(--e-borde); padding-top: 14px; display: grid; gap: 10px; }
+  .e-alcance { padding-bottom: 12px; border-bottom: 1px dashed var(--e-borde); }
+  .e-alcance-fila { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; }
+  .e-alcance-estado { margin: 8px 0 4px; font-size: 13.5px; font-weight: 600; color: var(--e-acento); min-height: 1.2em; }
+  .e-alcance .seg button { flex: 1; }
   .e-puerta-cabeza { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .e-puerta-cabeza .e-ent-titulo { margin-right: auto !important; }
   .e-puerta-led { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--e-tenue); min-width: 70px; }
@@ -1172,6 +1176,14 @@ const TEXTOS = {
     deshecho: 'Deshecho', rehecho: 'Rehecho', nadaDeshacer: 'No hay nada que deshacer', cortado: 'Clip cortado', normalizado: 'Clip normalizado ({d} dB)',
     sinEspacio: 'No hay espacio para guardar. Libera espacio o borra proyectos viejos.', errorT: 'Error', clicDerecho: 'Clic derecho (o mantener presionado) en un clip para más opciones',
     sinSoporte: 'Este navegador no puede grabar audio. Usa Chrome, Edge o Safari recientes.',
+    alcanceT: 'Alcance del micrófono: qué tan lejos escucha', alcTodo: 'Todo el cuarto', alcMedio: 'Medio', alcCerca: 'Solo lo cercano', alcCalibrar: 'Calibrar con mis dedos',
+    alcSilencio: 'Paso 1 de 2: silencio total… midiendo el cuarto', alcPrepara: 'Paso 2 de 2: prepárate…', alcToca: 'Paso 2 de 2: toca SUAVE con los dedos cerca del micrófono (4 segundos)',
+    alcNoOyo: 'No se escucharon golpes. Acércate más al micrófono o sube la ganancia y prueba otra vez.',
+    alcCalibrado: 'Listo: entra solo lo que suena como tus dedos cerca (desde {u} dB). El cuarto quedó afuera.', alcCalibradoYa: 'Calibrado: entra solo lo cercano (desde {u} dB).',
+    alcPocoMargen: 'Calibrado (desde {u} dB), pero tus golpes ({g} dB) están cerca del ruido del cuarto ({r} dB). Baja la ganancia del Yeti y acércate más al micrófono, y calibra otra vez.',
+    alcListo: 'Alcance ajustado: entra desde {u} dB',
+    alcanceAyuda: 'Lo que más ayuda es físico: <b>pon el micrófono cerca (5 a 15 cm) y baja la ganancia</b> (la perilla del Yeti y la de aquí). Así tus dedos llegan fuerte y lo de lejos llega muy bajito, y la compuerta lo deja afuera. Usa el patrón cardioide (el corazón) y apunta el micro a tus manos.',
+    prendidoM: 'prendido', apagadoM: 'apagado', limpiadorT: 'Limpiador del navegador', limpiadorAyuda: 'Quita ruidos constantes (aire, ventilador). Puede cambiar un poco el sonido del instrumento.', limpiadorSi: 'Limpiador de ruido prendido', limpiadorNo: 'Limpiador de ruido apagado',
     bancoT: 'Banco de sonidos', sonidosBtn: 'Sonidos', bancoSub: 'Sonidos hechos por la app (no son samples de nadie). Toca ▶ para oírlos y «Agregar» para ponerlos en el cabezal. Los loops siguen el tempo de tu proyecto.',
     bancoGuiaBtn: 'Cómo se hace un hard techno', bancoEjemploBtn: 'Crear el proyecto de ejemplo', ejemploInicioBtn: 'Abrir el ejemplo de hard techno (y aprende cómo se hace)',
     cat_bombos: 'Bombos y rumble', cat_platillos: 'Hats, ride y platillos', cat_percusion: 'Clap y percusión', cat_sintes: 'Sintes', cat_efectos: 'Efectos',
@@ -1294,6 +1306,14 @@ Clap:    . . . . X . . . . . . . X . . .</div>
     deshecho: 'Undone', rehecho: 'Redone', nadaDeshacer: 'Nothing to undo', cortado: 'Clip split', normalizado: 'Clip normalized ({d} dB)',
     sinEspacio: 'There’s no room to save. Free up space or delete old projects.', errorT: 'Error', clicDerecho: 'Right-click (or long-press) a clip for more options',
     sinSoporte: 'This browser can’t record audio. Use a recent Chrome, Edge or Safari.',
+    alcanceT: 'Mic reach: how far it listens', alcTodo: 'Whole room', alcMedio: 'Medium', alcCerca: 'Only what’s close', alcCalibrar: 'Calibrate with my fingers',
+    alcSilencio: 'Step 1 of 2: total silence… measuring the room', alcPrepara: 'Step 2 of 2: get ready…', alcToca: 'Step 2 of 2: tap SOFTLY with your fingers close to the mic (4 seconds)',
+    alcNoOyo: 'No hits were heard. Move closer to the mic or raise the gain and try again.',
+    alcCalibrado: 'Done: only sounds like your fingers up close get in (from {u} dB). The room stays out.', alcCalibradoYa: 'Calibrated: only close sounds get in (from {u} dB).',
+    alcPocoMargen: 'Calibrated (from {u} dB), but your hits ({g} dB) are close to the room noise ({r} dB). Lower the Yeti’s gain, move closer to the mic and calibrate again.',
+    alcListo: 'Reach set: it opens from {u} dB',
+    alcanceAyuda: 'What helps most is physical: <b>put the mic close (5 to 15 cm) and lower the gain</b> (the Yeti’s knob and this one). Your fingers arrive loud and distant sounds arrive very low, so the gate keeps them out. Use the cardioid pattern (the heart) and point the mic at your hands.',
+    prendidoM: 'on', apagadoM: 'off', limpiadorT: 'Browser noise cleaner', limpiadorAyuda: 'Removes steady noise (air, fan). It can change the instrument’s sound a little.', limpiadorSi: 'Noise cleaner on', limpiadorNo: 'Noise cleaner off',
     bancoT: 'Sound bank', sonidosBtn: 'Sounds', bancoSub: 'Sounds made by the app (not anyone’s samples). Press ▶ to hear them and “Add” to put them at the playhead. Loops follow your project’s tempo.',
     bancoGuiaBtn: 'How to make hard techno', bancoEjemploBtn: 'Create the example project', ejemploInicioBtn: 'Open the hard techno example (and learn how it’s made)',
     cat_bombos: 'Kicks and rumble', cat_platillos: 'Hats, ride and cymbals', cat_percusion: 'Clap and percussion', cat_sintes: 'Synths', cat_efectos: 'Effects',
@@ -2144,7 +2164,7 @@ async function prepararMic() {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error(t('sinSoporte'));
   const stream = await navigator.mediaDevices.getUserMedia({
     // Sin procesos del navegador (eco, ruido, ganancia automática): el sonido tal cual, con la menor latencia
-    audio: { deviceId: id ? { exact: id } : undefined, echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: { ideal: 2 }, latency: { ideal: 0 }, sampleRate: { ideal: ctx.sampleRate } },
+    audio: { deviceId: id ? { exact: id } : undefined, echoCancellation: false, noiseSuppression: !!ENT.limpiador, autoGainControl: false, channelCount: { ideal: 2 }, latency: { ideal: 0 }, sampleRate: { ideal: ctx.sampleRate } },
   });
   micDebeEstar = true;
   // Si nunca elegiste uno y hay un micrófono externo, se usa ese
@@ -4062,7 +4082,22 @@ function crearPuerta() {
   const pu = ENT.puerta;
   const caja = document.createElement('div');
   caja.className = 'e-ent-puerta';
-  caja.innerHTML = `<div class="e-puerta-cabeza"><p class="e-ent-titulo" style="margin:0">${t('puertaT')}</p>
+  const alc = pu.on ? (pu.alcance || 'manual') : 'todo';
+  caja.innerHTML = `<div class="e-alcance">
+      <p class="e-ent-titulo" style="margin:0 0 8px">${t('alcanceT')}</p>
+      <div class="seg e-seg" id="alcanceSeg" role="group" aria-label="${t('alcanceT')}">
+        <button type="button" data-alc="todo" aria-pressed="${alc === 'todo'}">${t('alcTodo')}</button>
+        <button type="button" data-alc="medio" aria-pressed="${alc === 'medio'}">${t('alcMedio')}</button>
+        <button type="button" data-alc="cerca" aria-pressed="${alc === 'cerca' || alc === 'calibrado'}">${t('alcCerca')}</button>
+      </div>
+      <div class="e-alcance-fila">
+        <button type="button" class="boton principal" id="alcanceCalibrar">${t('alcCalibrar')}</button>
+        <button type="button" class="e-chip${ENT.limpiador ? ' active' : ''}" id="limpiador" aria-pressed="${!!ENT.limpiador}" title="${t('limpiadorAyuda')}">${t('limpiadorT')}: ${t(ENT.limpiador ? 'prendidoM' : 'apagadoM')}</button>
+      </div>
+      <p class="e-alcance-estado" id="alcanceEstado" aria-live="polite">${pu.alcance === 'calibrado' && pu.on ? t('alcCalibradoYa', { u: pu.umbral }) : ''}</p>
+      <p class="e-patron-txt">${t('alcanceAyuda')}</p>
+    </div>
+    <div class="e-puerta-cabeza"><p class="e-ent-titulo" style="margin:0">${t('puertaT')}</p>
       <span class="e-puerta-led" id="puertaLed"><i></i><span></span></span>
       <button type="button" class="e-chip${pu.on ? ' active' : ''}" id="puertaOn" aria-pressed="${pu.on}">${t(pu.on ? 'puertaPrendida' : 'puertaApagada')}</button>
       <button type="button" class="e-chip" id="puertaMedir">${t('puertaMedir')}</button></div>
@@ -4086,7 +4121,76 @@ function crearPuerta() {
     construirEntrada();
   };
   caja.querySelector('#puertaMedir').onclick = medirRuido;
+  caja.querySelectorAll('#alcanceSeg button').forEach((b) => b.onclick = () => ponerAlcance(b.dataset.alc));
+  caja.querySelector('#alcanceCalibrar').onclick = calibrarAlcance;
+  caja.querySelector('#limpiador').onclick = async () => {
+    // El limpiador del navegador se pide al abrir el micrófono: hay que volver a abrirlo
+    ENT.limpiador = !ENT.limpiador; guardarEntrada();
+    if (mic) { cerrarMic(); try { await prepararMic(); } catch (e) { aviso(t('micSinPermiso')); } }
+    construirEntrada();
+    aviso(t(ENT.limpiador ? 'limpiadorSi' : 'limpiadorNo'), 3000);
+  };
   return caja;
+}
+
+/* ---------- Alcance del micrófono: que solo entre lo que está cerca ----------
+ * Lo cercano llega mucho más fuerte que lo lejano (cada vez que la distancia se duplica, baja ~6 dB).
+ * La compuerta usa eso: solo se abre con lo fuerte (tus dedos cerca) y deja afuera lo de lejos. */
+const esperar = (ms) => new Promise((ok) => setTimeout(ok, ms));
+async function medirVentanas(ms) {
+  const picos = [], fin = performance.now() + ms;
+  while (performance.now() < fin) { picos.push(dbDe(picoDe(mic.medidorPre))); await esperar(30); }
+  return picos.filter((x) => isFinite(x));
+}
+function estadoAlcance(txt) { const el = $('alcanceEstado'); if (el) el.textContent = txt; }
+async function ruidoDelCuarto() {
+  estadoAlcance(t('alcSilencio'));
+  await esperar(300);
+  const v = await medirVentanas(2000);
+  const r = v.length ? Math.max(...v) : -80;
+  ENT.puerta.ruido = Math.round(r);
+  return ENT.puerta.ruido;
+}
+async function ponerAlcance(modo) {
+  const pu = ENT.puerta;
+  if (modo === 'todo') { pu.on = false; pu.alcance = 'todo'; guardarEntrada(); aplicarEntrada(); construirEntrada(); return; }
+  try { await prepararMic(); } catch (e) { aviso(t('micSinPermiso')); return; }
+  const ruido = pu.ruido != null ? pu.ruido : await ruidoDelCuarto();
+  const lim = (v) => Math.round(Math.max(-80, Math.min(-10, v)));
+  if (modo === 'medio') Object.assign(pu, { umbral: lim(ruido + 12), rango: -50, mantener: 80, lib: 150 });
+  else Object.assign(pu, { umbral: lim(ruido + 24), rango: -80, mantener: 40, lib: 80 });
+  pu.on = true; pu.alcance = modo;
+  guardarEntrada(); aplicarEntrada(); construirEntrada();
+  estadoAlcance(t('alcListo', { u: pu.umbral }));
+  aviso(t('alcListo', { u: pu.umbral }), 3500);
+}
+// Dos pasos: silencio (para medir el cuarto) y golpes suaves cerca del micrófono
+async function calibrarAlcance() {
+  try { await prepararMic(); } catch (e) { aviso(t('micSinPermiso')); return; }
+  const b = $('alcanceCalibrar'); if (b) b.disabled = true;
+  const pu = ENT.puerta;
+  const antes = pu.on;
+  pu.on = false; aplicarEntrada();             // mientras mide, que entre todo
+  try {
+    const ruido = await ruidoDelCuarto();
+    estadoAlcance(t('alcPrepara'));
+    await esperar(1500);
+    estadoAlcance(t('alcToca'));
+    const v = await medirVentanas(4000);
+    // Solo el punto más fuerte de cada golpe (no su cola)
+    const golpes = v.filter((x, i) => x > ruido + 10 && x >= (v[i - 1] ?? -Infinity) && x > (v[i + 1] ?? -Infinity)).sort((a, c) => a - c);
+    if (golpes.length < 4) {
+      pu.on = antes; aplicarEntrada();
+      estadoAlcance(t('alcNoOyo'));
+      return;
+    }
+    const suaves = golpes[Math.floor(golpes.length * 0.2)];        // los golpes más suaves que diste
+    const umbral = Math.round(Math.max(-80, Math.min(-10, Math.max(ruido + 8, suaves - 6))));
+    Object.assign(pu, { umbral, rango: -80, mantener: 40, lib: 90, on: true, alcance: 'calibrado' });
+    guardarEntrada(); aplicarEntrada(); construirEntrada();
+    const margen = suaves - ruido;
+    estadoAlcance(t(margen < 14 ? 'alcPocoMargen' : 'alcCalibrado', { u: umbral, r: Math.round(ruido), g: Math.round(suaves) }));
+  } finally { const bb = $('alcanceCalibrar'); if (bb) bb.disabled = false; }
 }
 // Escucha el cuarto 2 segundos en silencio y pone el umbral un poco por encima del ruido
 async function medirRuido() {
