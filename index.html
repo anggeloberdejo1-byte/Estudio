@@ -847,6 +847,13 @@
         <button type="button" data-v="no" data-i18n="rapidaNo">No: con los efectos de la pista</button>
       </div>
       <p class="nota-ajustes" data-i18n="rapidaNota" style="margin-top:8px">Con la escucha rápida te oyes sin pasar por el compresor de la pista ni el limitador del maestro (cada uno suma unos 6 ms). La toma se graba igual.</p>
+      <p class="settings-section-title" style="margin-top:14px" data-i18n="buferT">Tamaño del búfer (como en Pro Tools)</p>
+      <div class="seg" id="ajBufer">
+        <button type="button" data-bufer="minimo" data-i18n="buferMin">Mínimo</button>
+        <button type="button" data-bufer="normal" data-i18n="buferNormal">Normal</button>
+        <button type="button" data-bufer="seguro" data-i18n="buferSeguro">Seguro</button>
+      </div>
+      <p class="nota-ajustes" id="buferNota" style="margin-top:8px"></p>
       <p class="settings-section-title" style="margin-top:16px" data-i18n="clickSonidoT">Sonido del metrónomo</p>
       <div class="seg" id="ajClickSonido">
         <button type="button" data-sonido="clic" data-i18n="sonClic">Clic</button>
@@ -1127,6 +1134,54 @@ class Compuerta extends AudioWorkletProcessor {
   }
 }
 registerProcessor('compuerta', Compuerta);
+
+// Compresor sin retraso: aprieta en el mismo instante en que llega el sonido (el del navegador "mira adelante" y retrasa ~6 ms)
+class Compresor extends AudioWorkletProcessor {
+  static get parameterDescriptors() {
+    const k = 'k-rate';
+    return [
+      { name: 'activa', defaultValue: 0, minValue: 0, maxValue: 1, automationRate: k },
+      { name: 'umbral', defaultValue: -20, minValue: -100, maxValue: 0, automationRate: k },
+      { name: 'ratio', defaultValue: 4, minValue: 1, maxValue: 30, automationRate: k },
+      { name: 'ataque', defaultValue: 10, minValue: 0.01, maxValue: 500, automationRate: k },
+      { name: 'lib', defaultValue: 150, minValue: 1, maxValue: 5000, automationRate: k },
+      { name: 'rodilla', defaultValue: 6, minValue: 0, maxValue: 40, automationRate: k },
+      { name: 'gan', defaultValue: 0, minValue: -24, maxValue: 36, automationRate: k },
+    ];
+  }
+  constructor() { super(); this.gr = 0; this.cuenta = 0; this.minGr = 0; }
+  process(inputs, outputs, p) {
+    const ent = inputs[0], sal = outputs[0];
+    if (!ent || !ent.length) return true;
+    const n = ent[0].length;
+    if (p.activa[0] < 0.5) {
+      for (let c = 0; c < sal.length; c++) sal[c].set(ent[Math.min(c, ent.length - 1)]);
+      this.gr = 0; this.minGr = 0;
+    } else {
+      const sr = sampleRate, T = p.umbral[0], R = p.ratio[0], W = p.rodilla[0], pend = 1 / R - 1;
+      const cAt = Math.exp(-1 / (sr * p.ataque[0] / 1000)), cLib = Math.exp(-1 / (sr * p.lib[0] / 1000));
+      const make = p.gan[0];
+      for (let i = 0; i < n; i++) {
+        let x = 0;
+        for (let c = 0; c < ent.length; c++) { const v = ent[c][i]; const a = v < 0 ? -v : v; if (a > x) x = a; }
+        const nivel = x > 1e-6 ? 20 * Math.log10(x) : -120, sobre = nivel - T;
+        // Cuánto hay que bajar (con rodilla suave o dura)
+        let meta;
+        if (2 * sobre < -W) meta = 0;
+        else if (W > 0 && 2 * Math.abs(sobre) <= W) meta = pend * (sobre + W / 2) * (sobre + W / 2) / (2 * W);
+        else meta = pend * sobre;
+        this.gr = meta < this.gr ? meta + (this.gr - meta) * cAt : meta + (this.gr - meta) * cLib;
+        if (this.gr < this.minGr) this.minGr = this.gr;
+        const g = Math.pow(10, (this.gr + make) / 20);
+        for (let c = 0; c < sal.length; c++) sal[c][i] = ent[Math.min(c, ent.length - 1)][i] * g;
+      }
+    }
+    this.cuenta += n;
+    if (this.cuenta > sampleRate * 0.05) { this.cuenta = 0; this.port.postMessage(this.minGr); this.minGr = this.gr; }
+    return true;
+  }
+}
+registerProcessor('compresor', Compresor);
 </script>
 
 <script>
@@ -1187,6 +1242,8 @@ const TEXTOS = {
     deshecho: 'Deshecho', rehecho: 'Rehecho', nadaDeshacer: 'No hay nada que deshacer', cortado: 'Clip cortado', normalizado: 'Clip normalizado ({d} dB)',
     sinEspacio: 'No hay espacio para guardar. Libera espacio o borra proyectos viejos.', errorT: 'Error', clicDerecho: 'Clic derecho (o mantener presionado) en un clip para más opciones',
     sinSoporte: 'Este navegador no puede grabar audio. Usa Chrome, Edge o Safari recientes.',
+    buferT: 'Tamaño del búfer (como en Pro Tools)', buferMin: 'Mínimo', buferNormal: 'Normal', buferSeguro: 'Seguro',
+    buferNota: 'Ahora: {ms} ms de búfer. Mínimo = menos retraso al escucharte. Si se oyen cortes o chasquidos, sube a Normal o Seguro.', buferRecarga: 'Cambiando el búfer: la app se recarga…',
     retrasoBien: 'Retraso al escucharte: <b>{ms} ms</b>. Excelente, casi no se nota.', retrasoMedio: 'Retraso al escucharte: <b>{ms} ms</b>. Se puede notar un poquito.',
     retrasoAlto: 'Retraso al escucharte: <b>{ms} ms</b>. Se nota. Prende la escucha rápida, o escúchate por la salida de audífonos del micrófono (ahí es cero).',
     retrasoAltoR: 'Retraso al escucharte: <b>{ms} ms</b>. Es lo que tarda el navegador en recibir y devolver el sonido. Para cero retraso, escúchate por la salida de audífonos del micrófono.',
@@ -1194,7 +1251,7 @@ const TEXTOS = {
     retrasoFrecuencia: '<b>Ojo: tu micrófono está a {m} kHz y la salida a {s} kHz.</b> El navegador tiene que convertir y eso suma retraso. En la Mac abre «Configuración de Audio MIDI» y pon el micrófono y la salida de audífonos a 48 kHz (48.000 Hz); luego recarga la app.',
     retrasoBT: 'Retraso al escucharte: <b>{ms} ms</b>. <b>Tus audífonos parecen Bluetooth</b>: suman 150 a 250 ms y nunca se va a sentir al instante. Usa audífonos con cable, mejor conectados al micrófono.',
     usarSalidaMic: 'Usar la salida de audífonos de mi micrófono (sin retraso)', usarSalidaMicListo: 'Listo: conecta tus audífonos al Yeti (abajo tiene la entrada) y sube su perilla. Te escuchas directo, sin retraso. La app ya no te devuelve tu voz.',
-    rapidaT: 'Escucha rápida (menos retraso)', rapidaSi: 'Sí: directo', rapidaNo: 'No: con efectos de la pista', rapidaNota: 'Con la escucha rápida te oyes sin pasar por el compresor de la pista ni el limitador del maestro (cada uno suma unos 6 ms). La toma se graba igual.',
+    rapidaT: 'Escucha rápida (menos retraso)', rapidaSi: 'Sí: directo', rapidaNo: 'No: con efectos de la pista', rapidaNota: 'Con la escucha rápida te oyes con la compuerta, el EQ y el compresor de la entrada (todos sin retraso), directo a tus audífonos, sin pasar por el limitador del maestro. La toma se graba igual.',
     alcanceT: 'Alcance del micrófono: qué tan lejos escucha', alcTodo: 'Todo el cuarto', alcMedio: 'Medio', alcCerca: 'Solo lo cercano', alcCalibrar: 'Calibrar con mis dedos',
     alcSilencio: 'Paso 1 de 2: silencio total… midiendo el cuarto', alcPrepara: 'Paso 2 de 2: prepárate…', alcToca: 'Paso 2 de 2: toca SUAVE con los dedos cerca del micrófono (4 segundos)',
     alcNoOyo: 'No se escucharon golpes. Acércate más al micrófono o sube la ganancia y prueba otra vez.',
@@ -1325,6 +1382,8 @@ Clap:    . . . . X . . . . . . . X . . .</div>
     deshecho: 'Undone', rehecho: 'Redone', nadaDeshacer: 'Nothing to undo', cortado: 'Clip split', normalizado: 'Clip normalized ({d} dB)',
     sinEspacio: 'There’s no room to save. Free up space or delete old projects.', errorT: 'Error', clicDerecho: 'Right-click (or long-press) a clip for more options',
     sinSoporte: 'This browser can’t record audio. Use a recent Chrome, Edge or Safari.',
+    buferT: 'Buffer size (like in Pro Tools)', buferMin: 'Minimum', buferNormal: 'Normal', buferSeguro: 'Safe',
+    buferNota: 'Now: {ms} ms buffer. Minimum = less delay when hearing yourself. If you hear dropouts or clicks, go up to Normal or Safe.', buferRecarga: 'Changing the buffer: the app reloads…',
     retrasoBien: 'Monitoring delay: <b>{ms} ms</b>. Excellent, barely noticeable.', retrasoMedio: 'Monitoring delay: <b>{ms} ms</b>. You might notice it a little.',
     retrasoAlto: 'Monitoring delay: <b>{ms} ms</b>. Noticeable. Turn on fast monitoring, or listen through the mic’s headphone output (zero delay there).',
     retrasoAltoR: 'Monitoring delay: <b>{ms} ms</b>. That’s how long the browser takes to receive and send back the sound. For zero delay, listen through the mic’s headphone output.',
@@ -1332,7 +1391,7 @@ Clap:    . . . . X . . . . . . . X . . .</div>
     retrasoFrecuencia: '<b>Note: your mic runs at {m} kHz and the output at {s} kHz.</b> The browser has to convert, which adds delay. On a Mac open “Audio MIDI Setup” and set both the mic and the headphone output to 48 kHz (48,000 Hz), then reload the app.',
     retrasoBT: 'Monitoring delay: <b>{ms} ms</b>. <b>Your headphones look like Bluetooth</b>: they add 150–250 ms and will never feel instant. Use wired headphones, ideally plugged into the mic.',
     usarSalidaMic: 'Use my microphone’s headphone output (zero delay)', usarSalidaMicListo: 'Done: plug your headphones into the Yeti (the jack is underneath) and turn up its knob. You hear yourself directly, with no delay. The app no longer sends your voice back.',
-    rapidaT: 'Fast monitoring (less delay)', rapidaSi: 'Yes: direct', rapidaNo: 'No: with track effects', rapidaNota: 'Fast monitoring skips the track compressor and the master limiter (each adds about 6 ms) when you hear yourself. The take is recorded the same.',
+    rapidaT: 'Fast monitoring (less delay)', rapidaSi: 'Yes: direct', rapidaNo: 'No: with track effects', rapidaNota: 'Fast monitoring lets you hear the input gate, EQ and compressor (all zero-delay) straight to your headphones, skipping the master limiter. The take is recorded the same.',
     alcanceT: 'Mic reach: how far it listens', alcTodo: 'Whole room', alcMedio: 'Medium', alcCerca: 'Only what’s close', alcCalibrar: 'Calibrate with my fingers',
     alcSilencio: 'Step 1 of 2: total silence… measuring the room', alcPrepara: 'Step 2 of 2: get ready…', alcToca: 'Step 2 of 2: tap SOFTLY with your fingers close to the mic (4 seconds)',
     alcNoOyo: 'No hits were heard. Move closer to the mic or raise the gain and try again.',
@@ -1768,7 +1827,9 @@ async function asegurarAudio() {
   if (ctx) { if (ctx.state !== 'running') await ctx.resume().catch(() => {}); return ctx; }
   const AC = window.AudioContext || window.webkitAudioContext;
   if (!AC) { aviso(t('sinSoporte'), 5000); throw new Error('sin audio'); }
-  ctx = new AC({ latencyHint: 'interactive' });
+  // Búfer (como en Pro Tools): más chico = menos retraso; si se oyen cortes, se sube
+  const BUFER = { minimo: 0, normal: 'interactive', seguro: 'balanced' };
+  try { ctx = new AC({ latencyHint: BUFER[leerPref('bufer', 'minimo')] ?? 0 }); } catch (e) { ctx = new AC({ latencyHint: 'interactive' }); }
   urlGrabador = URL.createObjectURL(new Blob([$('codigoGrabador').textContent], { type: 'application/javascript' }));
   await ctx.audioWorklet.addModule(urlGrabador);
   await aplicarSalida();
@@ -1814,13 +1875,23 @@ function paramsComp(o, esEntrada) {
   return esEntrada ? { umbral: -o.comp * 30, ratio: 1.5 + o.comp * 6, ataque: 4, lib: 120, gan: 0 }
     : { umbral: -o.comp * 32, ratio: 1.5 + o.comp * 6, ataque: 6, lib: 160, gan: o.comp * 4 };
 }
-function ponerComp(nodo, ganancia, cp, fijar) {
-  fijar(nodo.threshold, Math.max(-100, Math.min(0, cp.umbral)));
-  fijar(nodo.ratio, Math.max(1, Math.min(20, cp.ratio)));
-  fijar(nodo.attack, Math.max(0, Math.min(1, cp.ataque / 1000)));
-  fijar(nodo.release, Math.max(0.01, Math.min(1, cp.lib / 1000)));
-  fijar(nodo.knee, Math.max(0, Math.min(40, cp.rodilla == null ? 6 : cp.rodilla)));
-  fijar(ganancia.gain, dbAGan(cp.gan));
+// Nuestro compresor (sin retraso). La perilla 'reduction' se actualiza sola para el medidor.
+function crearCompresor(c) {
+  const n = new AudioWorkletNode(c, 'compresor', { numberOfInputs: 1, numberOfOutputs: 1 });
+  n.reduction = 0;
+  n.port.onmessage = (e) => { n.reduction = e.data; };
+  return n;
+}
+function ponerCompresor(nodo, cp) {
+  const pr = nodo.parameters, v = (k, x) => { pr.get(k).value = x; };
+  v('activa', cp ? 1 : 0);
+  if (!cp) return;
+  v('umbral', Math.max(-100, Math.min(0, cp.umbral)));
+  v('ratio', Math.max(1, Math.min(30, cp.ratio)));
+  v('ataque', Math.max(0.01, Math.min(500, cp.ataque)));
+  v('lib', Math.max(1, Math.min(5000, cp.lib)));
+  v('rodilla', Math.max(0, Math.min(40, cp.rodilla == null ? 6 : cp.rodilla)));
+  v('gan', Math.max(-24, Math.min(36, cp.gan)));
 }
 
 // Cadena: clips → pista (corte de graves, EQ, compresor, fader, paneo, envíos) → maestro (limitador) → salida
@@ -1857,15 +1928,13 @@ function construirGrafo(c, destino, soloPistas) {
     k.eqG = c.createBiquadFilter(); k.eqG.type = 'lowshelf'; k.eqG.frequency.value = 120;
     k.eqM = c.createBiquadFilter(); k.eqM.type = 'peaking'; k.eqM.frequency.value = 1000; k.eqM.Q.value = 0.8;
     k.eqA = c.createBiquadFilter(); k.eqA.type = 'highshelf'; k.eqA.frequency.value = 7000;
-    k.comp = c.createDynamicsCompressor(); k.comp.knee.value = 6; k.comp.attack.value = 0.006; k.comp.release.value = 0.16;
-    k.compGan = c.createGain();
+    k.comp = crearCompresor(c);
     k.fader = c.createGain();
     k.pan = c.createStereoPanner();
     k.envRev = c.createGain(); k.envDel = c.createGain();
     k.med = c.createAnalyser(); k.med.fftSize = 1024;
     k.entrada.connect(k.hpf).connect(k.eqG).connect(k.eqM).connect(k.eqA);
-    k.eqA.connect(k.fader);
-    k.comp.connect(k.compGan).connect(k.fader);
+    k.eqA.connect(k.comp).connect(k.fader);
     k.compActivo = false;
     k.fader.connect(k.pan);
     k.pan.connect(g.maestro);
@@ -1892,8 +1961,7 @@ function aplicarMezcla(g = G, inmediato = false) {
     fijar(k.hpf.frequency, p.hpf ? 80 : 10);
     fijar(k.eqG.gain, p.eq[0]); fijar(k.eqM.gain, p.eq[1]); fijar(k.eqA.gain, p.eq[2]);
     const cp = paramsComp(p, false), usar = !!cp;
-    if (usar !== k.compActivo) { k.eqA.disconnect(); k.eqA.connect(usar ? k.comp : k.fader); k.compActivo = usar; }
-    if (usar) ponerComp(k.comp, k.compGan, cp, fijar);
+    ponerCompresor(k.comp, cp); k.compActivo = usar;
     fijar(k.envRev.gain, p.rev);
     fijar(k.envDel.gain, p.del);
   }
@@ -2213,9 +2281,8 @@ async function prepararMic() {
   m.grabador.connect(mudo).connect(ctx.destination);
   m.grabador.port.onmessage = (e) => recibirGrabador(e.data);
   // Canal de entrada
-  const n = { gan: ctx.createGain(), eq: crearBandas(ctx), comp: ctx.createDynamicsCompressor(), compGan: ctx.createGain(), salida: ctx.createGain(), rev: ctx.createGain(), compActivo: false, grabaDe: null };
+  const n = { gan: ctx.createGain(), eq: crearBandas(ctx), comp: crearCompresor(ctx), salida: ctx.createGain(), rev: ctx.createGain(), compActivo: false, grabaDe: null };
   n.salida.channelCount = 2; n.salida.channelCountMode = 'explicit';
-  n.comp.knee.value = 6; n.comp.attack.value = 0.004; n.comp.release.value = 0.12;
   // Compuerta de ruido justo después de la ganancia
   n.puerta = new AudioWorkletNode(ctx, 'compuerta', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [Math.min(2, m.canales)] });
   n.puerta.port.onmessage = (e) => { m.puertaAbierta = !!e.data; };
@@ -2226,12 +2293,12 @@ async function prepararMic() {
   let previo = n.puerta;
   for (const b of n.eq) { previo.connect(b); previo = b; }
   n.ultimo = previo;
-  previo.connect(n.salida);
-  // Escucha rápida: sale después del EQ, sin pasar por compresores ni limitador (cada uno suma ~6 ms)
+  // Compresor sin retraso, siempre en la cadena (se prende y apaga por dentro)
+  previo.connect(n.comp).connect(n.salida);
+  // Escucha rápida: después del compresor (que no retrasa), directo a la salida: sin compresores de pista ni limitador
   n.rapida = ctx.createGain(); n.rapida.channelCount = 2; n.rapida.channelCountMode = 'explicit';
   n.divRapido = ctx.createChannelSplitter(2);
-  previo.connect(n.rapida).connect(n.divRapido);
-  n.comp.connect(n.compGan).connect(n.salida);
+  n.comp.connect(n.rapida).connect(n.divRapido);
   n.div = ctx.createChannelSplitter(2);
   n.salida.connect(n.div);
   n.salida.connect(n.rev);
@@ -2255,7 +2322,7 @@ async function prepararMic() {
 function cerrarMic() {
   if (!mic) return;
   mic.stream.getTracks().forEach((x) => x.stop());
-  for (const x of [mic.fuente, mic.grabador, mic.ent.gan, mic.ent.puerta, ...mic.ent.eq, mic.ent.comp, mic.ent.compGan, mic.ent.salida, mic.ent.rev, mic.ent.div, mic.ent.rapida, mic.ent.divRapido, ...mic.monitores]) { try { x.disconnect(); } catch (e) {} }
+  for (const x of [mic.fuente, mic.grabador, mic.ent.gan, mic.ent.puerta, ...mic.ent.eq, mic.ent.comp, mic.ent.salida, mic.ent.rev, mic.ent.div, mic.ent.rapida, mic.ent.divRapido, ...mic.monitores]) { try { x.disconnect(); } catch (e) {} }
   mic = null;
   $('eNivelEnt').hidden = true;
 }
@@ -2299,8 +2366,7 @@ function aplicarEntrada(inmediato = false) {
   pp.get('mantener').value = pu.mantener; pp.get('lib').value = pu.lib;
   n.eq.forEach((b, i) => fijar(b.gain, ENT.eq[i]));
   const cp = paramsComp(ENT, true), usar = !!cp;
-  if (usar !== n.compActivo) { n.ultimo.disconnect(); n.ultimo.connect(usar ? n.comp : n.salida); n.ultimo.connect(n.rapida); n.compActivo = usar; }
-  if (usar) ponerComp(n.comp, n.compGan, cp, fijar);
+  ponerCompresor(n.comp, cp); n.compActivo = usar;
   // Reverb solo para escucharte (va a la reverb del mezclador)
   try { n.rev.disconnect(); } catch (e) {}
   if (G) n.rev.connect(G.rev);
@@ -2397,7 +2463,7 @@ function retrasoEscucha() {
   const base = cal && typeof cal.ms === 'number' && cal.modo === 'calibrada' ? cal.ms / 1000
     : (ctx.baseLatency || 0) + (ctx.outputLatency || 0) + (ajustes.latency || 0.01);
   let extra = 0;
-  if (!escuchaRapida()) extra += 0.012 + (mic && mic.ent.compActivo ? 0.006 : 0);
+  if (!escuchaRapida()) extra += 0.006;      // el limitador del maestro
   if (ENT.limpiador) extra += 0.01;
   // El micrófono y la salida a distinta frecuencia: el navegador convierte en el camino y eso suma
   const srMic = ajustes.sampleRate || 0, distinta = !!(srMic && Math.abs(srMic - ctx.sampleRate) > 1);
@@ -4109,7 +4175,7 @@ function construirMandosComp() {
     mando('umbral', t('compUmbral'), { min: -60, max: 0, defecto: -20, leer: () => o.cmp.umbral, set: (v) => { o.cmp.umbral = Math.round(v * 2) / 2; }, formato: (v) => `${v.toFixed(1)} dB` }),
     mando('ratio', t('compRatio'), { min: 0, max: 1, defecto: logA(4, 1, 20), leer: () => logA(o.cmp.ratio, 1, 20), set: (f) => { o.cmp.ratio = Math.round(logDe(f, 1, 20) * 10) / 10; }, formato: (f) => `${(Math.round(logDe(f, 1, 20) * 10) / 10)}:1` }),
     mando('ataque', t('compAtaque'), { min: 0, max: 1, defecto: logA(10, 0.1, 100), leer: () => logA(Math.max(0.1, o.cmp.ataque), 0.1, 100), set: (f) => { const v = logDe(f, 0.1, 100); o.cmp.ataque = Math.round(v * (v < 1 ? 100 : 10)) / (v < 1 ? 100 : 10); }, formato: (f) => fmtMs(logDe(f, 0.1, 100)) }),
-    mando('lib', t('compLib'), { min: 0, max: 1, defecto: logA(150, 5, 1000), leer: () => logA(Math.max(5, o.cmp.lib), 5, 1000), set: (f) => { o.cmp.lib = Math.round(logDe(f, 5, 1000)); }, formato: (f) => fmtMs(logDe(f, 5, 1000)) }),
+    mando('lib', t('compLib'), { min: 0, max: 1, defecto: logA(150, 5, 5000), leer: () => logA(Math.max(5, o.cmp.lib), 5, 5000), set: (f) => { o.cmp.lib = Math.round(logDe(f, 5, 5000)); }, formato: (f) => fmtMs(logDe(f, 5, 5000)) }),
     mando('rodilla', t('compRodilla'), { min: 0, max: 40, defecto: 6, leer: () => (o.cmp.rodilla == null ? 6 : o.cmp.rodilla), set: (v) => { o.cmp.rodilla = Math.round(v); }, formato: (v) => (v < 3 ? t('compDura') : v > 20 ? t('compSuaveR') : `${Math.round(v)} dB`) }),
     mando('gan', t('compGan'), { min: 0, max: 24, defecto: 0, leer: () => o.cmp.gan, set: (v) => { o.cmp.gan = Math.round(v * 2) / 2; }, formato: (v) => `+${v.toFixed(1)} dB` }),
   );
@@ -4350,6 +4416,7 @@ async function renderizar(a, b, soloPistas, conClick, alAvanzar) {
   const sr = ctx.sampleRate, cola = soloPistas ? 2 : 3;
   const frames = Math.ceil((b - a + cola) * sr);
   const off = new OfflineAudioContext(2, frames, sr);
+  await off.audioWorklet.addModule(urlGrabador);      // nuestros compresores también al exportar
   const g = construirGrafo(off, off.destination, soloPistas);
   // Al exportar pistas sueltas, cada una sale sin el limitador del maestro
   if (soloPistas) { g.maestro.disconnect(); g.limit.disconnect(); g.maestro.connect(g.salida); }
@@ -5073,7 +5140,18 @@ function abrirAjustes() {
   document.querySelectorAll('#ajClickModo button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.modo === leerPref('clickModo', 'siempre') ? 'true' : 'false'));
   $('ajClickVol').value = leerPref('clickVol', 60);
   pintarAjEscucha();
-  document.querySelectorAll('#ajRapida button').forEach((b) => b.setAttribute('aria-pressed', (b.dataset.v === 'si') === escuchaRapida() ? 'true' : 'false'));
+  document.querySelectorAll('#ajBufer button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.bufer === leerPref('bufer', 'minimo') ? 'true' : 'false'));
+  $('buferNota').textContent = t('buferNota', { ms: ctx ? ((ctx.baseLatency || 0) * 1000).toFixed(1) : '—' });
+  document.querySelectorAll('#ajBufer button').forEach((b) => b.onclick = async () => {
+  if (b.dataset.bufer === leerPref('bufer', 'minimo')) return;
+  guardarPref('bufer', b.dataset.bufer);
+  // El búfer se elige al encender el audio: se guarda todo y se recarga la app
+  aviso(t('buferRecarga'), 3000);
+  if (R.grabando) await detenerGrabacion();
+  if (P) await guardarYa();
+  setTimeout(() => location.reload(), 600);
+});
+document.querySelectorAll('#ajRapida button').forEach((b) => b.setAttribute('aria-pressed', (b.dataset.v === 'si') === escuchaRapida() ? 'true' : 'false'));
   document.querySelectorAll('#ajClickSonido button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.sonido === leerPref('clickSonido', 'clic') ? 'true' : 'false'));
   if (!$('ajustes').open) $('ajustes').showModal();
 }

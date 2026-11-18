@@ -17,6 +17,7 @@ Estudio de grabación multipista en el navegador, pensado como un Pro Tools o Ab
 - **Exportar** la mezcla o cada pista por separado, todo el proyecto o solo el loop, en WAV de 16 o 24 bits, con o sin metrónomo.
 - **Banco de sonidos propio:** 24 sonidos fabricados por la app (bombos, rumble, hats, ride, clap, percusión, acid, stabs, pad, subida, impacto). Los loops siguen el tempo del proyecto. Se oyen con ▶ y se agregan en el cabezal.
 - **Ejemplo de hard techno:** un proyecto a 155 BPM ya armado y mezclado (intro, groove, break, drop y final) con una guía paso a paso de cómo se hace.
+- **Sin retraso:** compresor propio que no retrasa nada (el del navegador suma ~6 ms), escucha rápida con compuerta, EQ y compresor, y tamaño del búfer como en Pro Tools (mínimo, normal, seguro).
 - **Ajustes:** español o inglés, 12 paletas, micrófono y salida de audio, cuenta, metrónomo (clic, cencerro, madera o baqueta) y latencia. Más de 30 atajos de teclado al estilo Pro Tools, incluido el teclado numérico; toca ? para verlos.
 - **Exportar:** fundido de salida al final (3, 6 o 10 s).
 
