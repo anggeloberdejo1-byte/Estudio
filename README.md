@@ -8,7 +8,7 @@ Estudio de grabación multipista en el navegador, pensado como un Pro Tools o Ab
 
 - **Proyectos** con nombre, tempo (BPM) y compás (4/4, 3/4, 2/4, 5/4, 6/8, 7/8, 12/8). Se guardan solos en el equipo.
 - **Empezar con una base o canción:** la importa como primera pista, detecta el tempo y la acomoda en la rejilla.
-- **Multipista:** pistas con armar (R), mudo (M), solo (S) y escucharme (🎧). Al armar una pista te escuchas por ella como en Pro Tools (automático, siempre o apagado; tecla I). Cada pista elige qué entrada graba: 1, 2, 1+2 o estéreo — con una interfaz de dos entradas se graban dos pistas a la vez.
+- **Multipista:** pistas con armar (R), mudo (M), solo (S) y escucharme (🎧). Al armar una pista te escuchas por ella como en Pro Tools, con escucha rápida (directo a la salida, sin compresores) y el retraso a la vista, con aviso si el micrófono y la salida van a distinta frecuencia (automático, siempre o apagado; tecla I). Cada pista elige qué entrada graba: 1, 2, 1+2 o estéreo — con una interfaz de dos entradas se graban dos pistas a la vez.
 - **Grabación** con cuenta de 1 o 2 compases, metrónomo, compensación de latencia (automática o calibrada con 6 clics) y alineación al cuadro exacto. Se puede pinchar sobre la marcha (grabar mientras suena).
 - **Tomas en loop:** marca un tramo, graba vueltas seguidas y cada vuelta queda como una toma. Clic derecho sobre el clip para elegir la mejor.
 - **Edición:** mover (también entre pistas), recortar los bordes, fundidos de entrada y salida, cortar en el cabezal, duplicar, copiar con Alt, normalizar y ganancia del clip. Rejilla de compás, pulso, 1/8, 1/16 o libre. Deshacer y rehacer ilimitados. Marcas en la regla.

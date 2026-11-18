@@ -450,6 +450,11 @@
   .e-alcance-fila { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; }
   .e-alcance-estado { margin: 8px 0 4px; font-size: 13.5px; font-weight: 600; color: var(--e-acento); min-height: 1.2em; }
   .e-alcance .seg button { flex: 1; }
+  .e-retraso-caja { display: flex; flex-direction: column; gap: 6px; padding: 8px 10px; border-radius: 10px; background: var(--e-pozo); box-shadow: inset 0 0 0 1px var(--e-borde); }
+  .e-retraso { margin: 0; font-size: 12.5px; line-height: 1.4; color: var(--e-tenue); }
+  .e-retraso b { font-family: var(--mono); }
+  .e-retraso.bien b { color: #5fb27f; } .e-retraso.fuerte b { color: #e0a84a; } .e-retraso.alto b { color: #e2604a; }
+  .e-retraso-caja .e-chip { align-self: flex-start; white-space: normal; text-align: left; min-height: 28px; padding: 4px 12px; }
   .e-puerta-cabeza { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .e-puerta-cabeza .e-ent-titulo { margin-right: auto !important; }
   .e-puerta-led { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--e-tenue); min-width: 70px; }
@@ -836,6 +841,12 @@
         <button type="button" data-escucha="no" data-i18n="escuchaNo">Apagado</button>
       </div>
       <p class="nota-ajustes" id="escuchaNota" style="margin-top:8px"></p>
+      <p class="settings-section-title" style="margin-top:14px" data-i18n="rapidaT">Escucha rápida (menos retraso)</p>
+      <div class="seg" id="ajRapida">
+        <button type="button" data-v="si" data-i18n="rapidaSi">Sí: directo, sin efectos de la pista</button>
+        <button type="button" data-v="no" data-i18n="rapidaNo">No: con los efectos de la pista</button>
+      </div>
+      <p class="nota-ajustes" data-i18n="rapidaNota" style="margin-top:8px">Con la escucha rápida te oyes sin pasar por el compresor de la pista ni el limitador del maestro (cada uno suma unos 6 ms). La toma se graba igual.</p>
       <p class="settings-section-title" style="margin-top:16px" data-i18n="clickSonidoT">Sonido del metrónomo</p>
       <div class="seg" id="ajClickSonido">
         <button type="button" data-sonido="clic" data-i18n="sonClic">Clic</button>
@@ -1176,6 +1187,14 @@ const TEXTOS = {
     deshecho: 'Deshecho', rehecho: 'Rehecho', nadaDeshacer: 'No hay nada que deshacer', cortado: 'Clip cortado', normalizado: 'Clip normalizado ({d} dB)',
     sinEspacio: 'No hay espacio para guardar. Libera espacio o borra proyectos viejos.', errorT: 'Error', clicDerecho: 'Clic derecho (o mantener presionado) en un clip para más opciones',
     sinSoporte: 'Este navegador no puede grabar audio. Usa Chrome, Edge o Safari recientes.',
+    retrasoBien: 'Retraso al escucharte: <b>{ms} ms</b>. Excelente, casi no se nota.', retrasoMedio: 'Retraso al escucharte: <b>{ms} ms</b>. Se puede notar un poquito.',
+    retrasoAlto: 'Retraso al escucharte: <b>{ms} ms</b>. Se nota. Prende la escucha rápida, o escúchate por la salida de audífonos del micrófono (ahí es cero).',
+    retrasoAltoR: 'Retraso al escucharte: <b>{ms} ms</b>. Es lo que tarda el navegador en recibir y devolver el sonido. Para cero retraso, escúchate por la salida de audífonos del micrófono.',
+    retrasoEstimado: '(Estimado: toca «Calibrar» en Ajustes para medirlo de verdad.)',
+    retrasoFrecuencia: '<b>Ojo: tu micrófono está a {m} kHz y la salida a {s} kHz.</b> El navegador tiene que convertir y eso suma retraso. En la Mac abre «Configuración de Audio MIDI» y pon el micrófono y la salida de audífonos a 48 kHz (48.000 Hz); luego recarga la app.',
+    retrasoBT: 'Retraso al escucharte: <b>{ms} ms</b>. <b>Tus audífonos parecen Bluetooth</b>: suman 150 a 250 ms y nunca se va a sentir al instante. Usa audífonos con cable, mejor conectados al micrófono.',
+    usarSalidaMic: 'Usar la salida de audífonos de mi micrófono (sin retraso)', usarSalidaMicListo: 'Listo: conecta tus audífonos al Yeti (abajo tiene la entrada) y sube su perilla. Te escuchas directo, sin retraso. La app ya no te devuelve tu voz.',
+    rapidaT: 'Escucha rápida (menos retraso)', rapidaSi: 'Sí: directo', rapidaNo: 'No: con efectos de la pista', rapidaNota: 'Con la escucha rápida te oyes sin pasar por el compresor de la pista ni el limitador del maestro (cada uno suma unos 6 ms). La toma se graba igual.',
     alcanceT: 'Alcance del micrófono: qué tan lejos escucha', alcTodo: 'Todo el cuarto', alcMedio: 'Medio', alcCerca: 'Solo lo cercano', alcCalibrar: 'Calibrar con mis dedos',
     alcSilencio: 'Paso 1 de 2: silencio total… midiendo el cuarto', alcPrepara: 'Paso 2 de 2: prepárate…', alcToca: 'Paso 2 de 2: toca SUAVE con los dedos cerca del micrófono (4 segundos)',
     alcNoOyo: 'No se escucharon golpes. Acércate más al micrófono o sube la ganancia y prueba otra vez.',
@@ -1306,6 +1325,14 @@ Clap:    . . . . X . . . . . . . X . . .</div>
     deshecho: 'Undone', rehecho: 'Redone', nadaDeshacer: 'Nothing to undo', cortado: 'Clip split', normalizado: 'Clip normalized ({d} dB)',
     sinEspacio: 'There’s no room to save. Free up space or delete old projects.', errorT: 'Error', clicDerecho: 'Right-click (or long-press) a clip for more options',
     sinSoporte: 'This browser can’t record audio. Use a recent Chrome, Edge or Safari.',
+    retrasoBien: 'Monitoring delay: <b>{ms} ms</b>. Excellent, barely noticeable.', retrasoMedio: 'Monitoring delay: <b>{ms} ms</b>. You might notice it a little.',
+    retrasoAlto: 'Monitoring delay: <b>{ms} ms</b>. Noticeable. Turn on fast monitoring, or listen through the mic’s headphone output (zero delay there).',
+    retrasoAltoR: 'Monitoring delay: <b>{ms} ms</b>. That’s how long the browser takes to receive and send back the sound. For zero delay, listen through the mic’s headphone output.',
+    retrasoEstimado: '(Estimated: press “Calibrate” in Settings to measure it for real.)',
+    retrasoFrecuencia: '<b>Note: your mic runs at {m} kHz and the output at {s} kHz.</b> The browser has to convert, which adds delay. On a Mac open “Audio MIDI Setup” and set both the mic and the headphone output to 48 kHz (48,000 Hz), then reload the app.',
+    retrasoBT: 'Monitoring delay: <b>{ms} ms</b>. <b>Your headphones look like Bluetooth</b>: they add 150–250 ms and will never feel instant. Use wired headphones, ideally plugged into the mic.',
+    usarSalidaMic: 'Use my microphone’s headphone output (zero delay)', usarSalidaMicListo: 'Done: plug your headphones into the Yeti (the jack is underneath) and turn up its knob. You hear yourself directly, with no delay. The app no longer sends your voice back.',
+    rapidaT: 'Fast monitoring (less delay)', rapidaSi: 'Yes: direct', rapidaNo: 'No: with track effects', rapidaNota: 'Fast monitoring skips the track compressor and the master limiter (each adds about 6 ms) when you hear yourself. The take is recorded the same.',
     alcanceT: 'Mic reach: how far it listens', alcTodo: 'Whole room', alcMedio: 'Medium', alcCerca: 'Only what’s close', alcCalibrar: 'Calibrate with my fingers',
     alcSilencio: 'Step 1 of 2: total silence… measuring the room', alcPrepara: 'Step 2 of 2: get ready…', alcToca: 'Step 2 of 2: tap SOFTLY with your fingers close to the mic (4 seconds)',
     alcNoOyo: 'No hits were heard. Move closer to the mic or raise the gain and try again.',
@@ -2200,6 +2227,10 @@ async function prepararMic() {
   for (const b of n.eq) { previo.connect(b); previo = b; }
   n.ultimo = previo;
   previo.connect(n.salida);
+  // Escucha rápida: sale después del EQ, sin pasar por compresores ni limitador (cada uno suma ~6 ms)
+  n.rapida = ctx.createGain(); n.rapida.channelCount = 2; n.rapida.channelCountMode = 'explicit';
+  n.divRapido = ctx.createChannelSplitter(2);
+  previo.connect(n.rapida).connect(n.divRapido);
   n.comp.connect(n.compGan).connect(n.salida);
   n.div = ctx.createChannelSplitter(2);
   n.salida.connect(n.div);
@@ -2218,12 +2249,13 @@ async function prepararMic() {
   aplicarMonitores();
   llenarMics();
   $('eNivelEnt').hidden = false;
+  revisarSalida();
   return m;
 }
 function cerrarMic() {
   if (!mic) return;
   mic.stream.getTracks().forEach((x) => x.stop());
-  for (const x of [mic.fuente, mic.grabador, mic.ent.gan, mic.ent.puerta, ...mic.ent.eq, mic.ent.comp, mic.ent.compGan, mic.ent.salida, mic.ent.rev, mic.ent.div, ...mic.monitores]) { try { x.disconnect(); } catch (e) {} }
+  for (const x of [mic.fuente, mic.grabador, mic.ent.gan, mic.ent.puerta, ...mic.ent.eq, mic.ent.comp, mic.ent.compGan, mic.ent.salida, mic.ent.rev, mic.ent.div, mic.ent.rapida, mic.ent.divRapido, ...mic.monitores]) { try { x.disconnect(); } catch (e) {} }
   mic = null;
   $('eNivelEnt').hidden = true;
 }
@@ -2267,7 +2299,7 @@ function aplicarEntrada(inmediato = false) {
   pp.get('mantener').value = pu.mantener; pp.get('lib').value = pu.lib;
   n.eq.forEach((b, i) => fijar(b.gain, ENT.eq[i]));
   const cp = paramsComp(ENT, true), usar = !!cp;
-  if (usar !== n.compActivo) { n.ultimo.disconnect(); n.ultimo.connect(usar ? n.comp : n.salida); n.compActivo = usar; }
+  if (usar !== n.compActivo) { n.ultimo.disconnect(); n.ultimo.connect(usar ? n.comp : n.salida); n.ultimo.connect(n.rapida); n.compActivo = usar; }
   if (usar) ponerComp(n.comp, n.compGan, cp, fijar);
   // Reverb solo para escucharte (va a la reverb del mezclador)
   try { n.rev.disconnect(); } catch (e) {}
@@ -2281,7 +2313,7 @@ function aplicarEntrada(inmediato = false) {
     fuente.connect(mic.grabador);
     n.grabaDe = fuente;
   }
-  for (const g of mic.monitores) if (g.gain) fijar(g.gain, ENT.vol * (g._k || 1));
+  for (const g of mic.monitores) if (g.gain && !g._fijo) fijar(g.gain, ENT.vol * (g._k || 1));
 }
 
 /* ---------- Escucharte mientras grabas (como Pro Tools) ----------
@@ -2290,6 +2322,7 @@ function aplicarEntrada(inmediato = false) {
  * no:      solo por las pistas con 🎧 (si te escuchas por la salida de audífonos de tu micrófono o interfaz)
  * El 🎧 de cada pista te deja escucharte siempre por esa pista, armada o no. */
 const modoEscucha = () => leerPref('escucha', 'auto');
+const escuchaRapida = () => leerPref('escuchaRapida', true);
 function escuchaDe(p) {
   if (p.mon) return true;
   if (!p.arm) return false;
@@ -2299,6 +2332,7 @@ function escuchaDe(p) {
   return false;
 }
 let firmaEscucha = '';
+const firmaDeEscucha = () => (escuchaRapida() ? 'r:' : 'm:') + P.pistas.map((p) => (escuchaDe(p) ? `${p.id}${p.entrada}${escuchaRapida() ? `${p.vol}${p.pan}${p.mute}` : ''}` : '')).join('|');
 function actualizarEscucha() {
   if (!P) return;
   const b = $('escuchaBtn');
@@ -2307,8 +2341,7 @@ function actualizarEscucha() {
     const p = pistaDe(f.dataset.id), m = f.querySelector('[data-acc="mon"]');
     if (p && m) m.classList.toggle('auto', !p.mon && escuchaDe(p));
   });
-  const firma = P.pistas.map((p) => (escuchaDe(p) ? p.id + p.entrada : '')).join('|');
-  if (firma !== firmaEscucha && mic) aplicarMonitores();
+  if (firmaDeEscucha() !== firmaEscucha && mic) aplicarMonitores();
 }
 // Al armar una pista (o prender la escucha) se abre el micrófono para que te escuches de una vez
 function prepararEscucha() {
@@ -2317,28 +2350,78 @@ function prepararEscucha() {
   if (!leerPref('consejoVisto', false) && $('consejo').hidden) { $('consejo').hidden = false; requestAnimationFrame(redimensionar); }
 }
 
-// Te escuchas por cada pista que tenga 🎧 prendido (o armada, según el modo), con los efectos y el fader de esa pista
+// Te escuchas por cada pista que tenga 🎧 prendido (o armada, según el modo).
+// Escucha rápida: con el volumen y el paneo de la pista, directo a la salida (lo más corto posible).
+// Si no: por toda la cadena de la pista (sus efectos y el maestro), que suma un poco de retraso.
 function aplicarMonitores() {
   if (!mic || !G || !P) return;
   for (const x of mic.monitores) { try { x.disconnect(); } catch (e) {} }
   mic.monitores = [];
-  firmaEscucha = P.pistas.map((p) => (escuchaDe(p) ? p.id + p.entrada : '')).join('|');
-  const div = mic.ent.div;
+  firmaEscucha = firmaDeEscucha();
+  const rapida = escuchaRapida();
+  const div = rapida ? mic.ent.divRapido : mic.ent.div;
   for (const p of P.pistas) {
     if (!escuchaDe(p)) continue;
-    const k = G.canales.get(p.id);
-    if (!k) continue;
-    const ganancia = (canal, mult) => { const g = ctx.createGain(); g._k = mult; g.gain.value = ENT.vol * mult; div.connect(g, canal); g.connect(k.entrada); mic.monitores.push(g); return g; };
+    let destino;
+    if (rapida) {
+      const vol = ctx.createGain(), pan = ctx.createStereoPanner();
+      vol._fijo = true; vol.gain.value = p.mute ? 0 : p.vol; pan.pan.value = p.pan || 0;
+      vol.connect(pan).connect(ctx.destination);
+      mic.monitores.push(vol, pan);
+      destino = vol;
+    } else {
+      const k = G.canales.get(p.id);
+      if (!k) continue;
+      destino = k.entrada;
+    }
+    const ganancia = (canal, mult) => { const g = ctx.createGain(); g._k = mult; g.gain.value = ENT.vol * mult; div.connect(g, canal); g.connect(destino); mic.monitores.push(g); return g; };
     if (p.entrada === '2') ganancia(1, 1);
     else if (p.entrada === 'mezcla') { ganancia(0, 0.5); ganancia(1, 0.5); }
     else if (p.entrada === 'estereo') {
       const mz = ctx.createChannelMerger(2), gl = ctx.createGain(), gr = ctx.createGain();
       gl._k = gr._k = 1; gl.gain.value = gr.gain.value = ENT.vol;
-      div.connect(gl, 0); div.connect(gr, 1); gl.connect(mz, 0, 0); gr.connect(mz, 0, 1); mz.connect(k.entrada);
+      div.connect(gl, 0); div.connect(gr, 1); gl.connect(mz, 0, 0); gr.connect(mz, 0, 1); mz.connect(destino);
       mic.monitores.push(gl, gr, mz);
     } else ganancia(0, 1);
   }
   aplicarEntrada();
+}
+
+// Cuánto tarda tu voz en volver a tus oídos (entrada + salida + lo que sumen los efectos).
+// Si calibraste, se usa lo medido de verdad (los clics salen y vuelven por el micrófono).
+function retrasoEscucha() {
+  if (!ctx) return null;
+  const pista = mic && mic.stream.getAudioTracks()[0];
+  const ajustes = (pista && pista.getSettings && pista.getSettings()) || {};
+  const cal = leerPref('latencia', null);
+  const base = cal && typeof cal.ms === 'number' && cal.modo === 'calibrada' ? cal.ms / 1000
+    : (ctx.baseLatency || 0) + (ctx.outputLatency || 0) + (ajustes.latency || 0.01);
+  let extra = 0;
+  if (!escuchaRapida()) extra += 0.012 + (mic && mic.ent.compActivo ? 0.006 : 0);
+  if (ENT.limpiador) extra += 0.01;
+  // El micrófono y la salida a distinta frecuencia: el navegador convierte en el camino y eso suma
+  const srMic = ajustes.sampleRate || 0, distinta = !!(srMic && Math.abs(srMic - ctx.sampleRate) > 1);
+  return { total: base + extra, salida: ctx.outputLatency || 0, distinta, srMic, srSal: ctx.sampleRate, calibrado: !!(cal && cal.modo === 'calibrada') };
+}
+let salidaBluetooth = false;
+async function revisarSalida() {
+  try {
+    const id = leerPref('salidaId', '');
+    const sal = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === 'audiooutput');
+    const d = sal.find((x) => x.deviceId === (id || 'default')) || sal[0];
+    salidaBluetooth = !!(d && /airpods|bluetooth|beats|buds|bose|sony wh|jbl|\bbt\b|inalámbric|wireless/i.test(d.label));
+  } catch (e) {}
+}
+function pintarRetraso() {
+  const el = $('entRetraso');
+  if (!el) return;
+  const r = retrasoEscucha();
+  if (!r) { el.textContent = ''; return; }
+  const ms = Math.round(r.total * 1000);
+  const [clase, k] = salidaBluetooth ? ['alto', 'retrasoBT'] : ms <= 15 ? ['bien', 'retrasoBien'] : ms <= 30 ? ['fuerte', 'retrasoMedio'] : ['alto', escuchaRapida() ? 'retrasoAltoR' : 'retrasoAlto'];
+  let txt = t(k, { ms }) + (r.calibrado ? '' : ' ' + t('retrasoEstimado'));
+  if (r.distinta) txt += ' ' + t('retrasoFrecuencia', { m: (r.srMic / 1000).toFixed(1).replace('.0', ''), s: (r.srSal / 1000).toFixed(1).replace('.0', '') });
+  if (el.dataset.txt !== txt) { el.dataset.txt = txt; el.innerHTML = txt; el.className = 'e-retraso ' + clase; }
 }
 
 /* ---------- Latencia (salida + entrada) ---------- */
@@ -3950,6 +4033,9 @@ function construirEntrada() {
   fila.appendChild(crearPerilla({ etiqueta: t('fxReverb'), aria: `${t('fxReverb')} (${t('entT')})`, min: 0, max: 1, defecto: 0, leer: () => ENT.rev, poner: (v) => { ENT.rev = v; aplicarEntrada(); }, formato: fmtEnvio }));
   fila.appendChild(crearPerilla({ etiqueta: t('entVolumen'), aria: t('entVolumen'), min: 0, max: 2, defecto: 1, leer: () => ENT.vol, poner: (v) => { ENT.vol = v; aplicarEntrada(); }, formato: (v) => txtDb(v) + ' dB' }));
   c3.appendChild(fila);
+  c3.insertAdjacentHTML('beforeend', `<div class="e-retraso-caja"><p class="e-retraso" id="entRetraso"></p>
+    <button type="button" class="e-chip" id="usarSalidaMic">${t('usarSalidaMic')}</button></div>`);
+  c3.querySelector('#usarSalidaMic').onclick = () => { ponerEscucha('no'); aviso(t('usarSalidaMicListo'), 6000); };
   c3.insertAdjacentHTML('beforeend', `<p class="e-ent-titulo">${t('entGrabarCon')}</p>
     <div class="seg e-seg" id="entEfectos"><button type="button" data-v="si">${t('entConEfectos')}</button><button type="button" data-v="no">${t('entSinEfectos')}</button></div>
     <p class="e-ent-nota">${t('entNotaRev')}</p>`);
@@ -4839,7 +4925,7 @@ async function abrirProyecto(id) {
   pintarRejilla();
   pintarLcd(true);
   llenarMics().catch(() => {});
-  requestAnimationFrame(() => { redimensionar(); verTodo(); });
+  requestAnimationFrame(() => { if (P) { redimensionar(); verTodo(); } });
 }
 async function cerrarProyecto() {
   if (R.grabando) await detenerGrabacion();
@@ -4987,6 +5073,7 @@ function abrirAjustes() {
   document.querySelectorAll('#ajClickModo button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.modo === leerPref('clickModo', 'siempre') ? 'true' : 'false'));
   $('ajClickVol').value = leerPref('clickVol', 60);
   pintarAjEscucha();
+  document.querySelectorAll('#ajRapida button').forEach((b) => b.setAttribute('aria-pressed', (b.dataset.v === 'si') === escuchaRapida() ? 'true' : 'false'));
   document.querySelectorAll('#ajClickSonido button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.sonido === leerPref('clickSonido', 'clic') ? 'true' : 'false'));
   if (!$('ajustes').open) $('ajustes').showModal();
 }
@@ -5007,6 +5094,8 @@ $('escuchaBtn').onclick = () => {
   aviso(t(m === 'no' ? 'escuchaApagada' : 'escuchaPrendida'), 2200);
 };
 document.querySelectorAll('#ajEscucha button').forEach((b) => b.onclick = () => ponerEscucha(b.dataset.escucha));
+document.querySelectorAll('#ajRapida button').forEach((b) => b.onclick = () => { guardarPref('escuchaRapida', b.dataset.v === 'si'); if (mic) aplicarMonitores(); abrirAjustes(); });
+if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) navigator.mediaDevices.addEventListener('devicechange', () => revisarSalida());
 document.querySelectorAll('#ajClickSonido button').forEach((b) => b.onclick = () => {
   guardarPref('clickSonido', b.dataset.sonido); abrirAjustes();
   // Se oye cómo suena
@@ -5126,7 +5215,7 @@ function pintarEstadoNivel(db, ahora) {
 }
 
 /* ---------- Cuadro a cuadro: arreglo, pantallas y medidores ---------- */
-let ultimoCuadro = 0, cuadroAf = 0;
+let ultimoCuadro = 0, cuadroAf = 0, cuadroRetraso = 0;
 function cuadro(ahora) {
   requestAnimationFrame(cuadro);
   requestAnimationFrame(cuadroComp);
@@ -5166,6 +5255,7 @@ function cuadro(ahora) {
     dibujarMedidor($('entMedidor'), [v], pk);
     pintarEstadoNivel(entDb, ahora);
     pintarPuerta();
+    if (ahora - cuadroRetraso > 500) { cuadroRetraso = ahora; pintarRetraso(); }
   }
   if (ahora - cuadroAf > 60) { cuadroAf = ahora; pintarAfinador(); }
 }
