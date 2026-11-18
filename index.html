@@ -1242,6 +1242,9 @@ const TEXTOS = {
     deshecho: 'Deshecho', rehecho: 'Rehecho', nadaDeshacer: 'No hay nada que deshacer', cortado: 'Clip cortado', normalizado: 'Clip normalizado ({d} dB)',
     sinEspacio: 'No hay espacio para guardar. Libera espacio o borra proyectos viejos.', errorT: 'Error', clicDerecho: 'Clic derecho (o mantener presionado) en un clip para más opciones',
     sinSoporte: 'Este navegador no puede grabar audio. Usa Chrome, Edge o Safari recientes.',
+    directoT: 'Modo directo: cero retraso', directoSalir: 'Volviste a escucharte por la app',
+    directoHtml: `<h3>Listo. Ahora haz esto:</h3><ol><li><b>Conecta tus in-ears en la salida de audífonos de tu micrófono</b> ({m}). En el Blue Yeti está abajo, junto al cable USB.</li><li>La app ya manda la música por el micrófono, así que oyes <b>la música y tu voz juntas</b> por ahí.</li><li>Tu voz te llega <b>directo desde la cápsula del micrófono</b>, sin pasar por la computadora: <b>cero retraso de verdad</b>, como el monitoreo directo de una interfaz profesional.</li><li>El volumen de los audífonos es la <b>perilla del micrófono</b>. Si es un Yeti X o tiene perilla de mezcla, ahí equilibras tu voz con la música.</li></ol><p>La toma se sigue grabando igual en la app, y la latencia se compensa sola al grabar (toca «Calibrar» en Ajustes una vez).</p><p>Para volver a escucharte por la app: <button type="button" class="boton" id="salirDirecto">Salir del modo directo</button></p>`,
+    directoHtmlManual: `<h3>Casi listo. Haz esto:</h3><ol><li><b>Conecta tus in-ears en la salida de audífonos de tu micrófono</b> ({m}). En el Blue Yeti está abajo, junto al cable USB.</li><li>Este navegador no deja elegir la salida desde aquí: en la Mac abre <b>Ajustes del Sistema → Sonido → Salida</b> y elige tu micrófono (por ejemplo «Yeti Stereo Microphone»). Así la música de la app también suena por él.</li><li>Tu voz te llega <b>directo desde el micrófono</b>, sin pasar por la computadora: <b>cero retraso de verdad</b>.</li><li>El volumen de los audífonos es la <b>perilla del micrófono</b>.</li></ol><p>La app ya dejó de devolverte la voz (si no, la oirías dos veces).</p><p>Para volver a escucharte por la app: <button type="button" class="boton" id="salirDirecto">Salir del modo directo</button></p>`,
     buferT: 'Tamaño del búfer (como en Pro Tools)', buferMin: 'Mínimo', buferNormal: 'Normal', buferSeguro: 'Seguro',
     buferNota: 'Ahora: {ms} ms de búfer. Mínimo = menos retraso al escucharte. Si se oyen cortes o chasquidos, sube a Normal o Seguro.', buferRecarga: 'Cambiando el búfer: la app se recarga…',
     retrasoBien: 'Retraso al escucharte: <b>{ms} ms</b>. Excelente, casi no se nota.', retrasoMedio: 'Retraso al escucharte: <b>{ms} ms</b>. Se puede notar un poquito.',
@@ -1250,7 +1253,7 @@ const TEXTOS = {
     retrasoEstimado: '(Estimado: toca «Calibrar» en Ajustes para medirlo de verdad.)',
     retrasoFrecuencia: '<b>Ojo: tu micrófono está a {m} kHz y la salida a {s} kHz.</b> El navegador tiene que convertir y eso suma retraso. En la Mac abre «Configuración de Audio MIDI» y pon el micrófono y la salida de audífonos a 48 kHz (48.000 Hz); luego recarga la app.',
     retrasoBT: 'Retraso al escucharte: <b>{ms} ms</b>. <b>Tus audífonos parecen Bluetooth</b>: suman 150 a 250 ms y nunca se va a sentir al instante. Usa audífonos con cable, mejor conectados al micrófono.',
-    usarSalidaMic: 'Usar la salida de audífonos de mi micrófono (sin retraso)', usarSalidaMicListo: 'Listo: conecta tus audífonos al Yeti (abajo tiene la entrada) y sube su perilla. Te escuchas directo, sin retraso. La app ya no te devuelve tu voz.',
+    usarSalidaMic: '⚡ Modo directo: escucharme por el micrófono (cero retraso)', usarSalidaMicListo: 'Listo: conecta tus audífonos al Yeti (abajo tiene la entrada) y sube su perilla. Te escuchas directo, sin retraso. La app ya no te devuelve tu voz.',
     rapidaT: 'Escucha rápida (menos retraso)', rapidaSi: 'Sí: directo', rapidaNo: 'No: con efectos de la pista', rapidaNota: 'Con la escucha rápida te oyes con la compuerta, el EQ y el compresor de la entrada (todos sin retraso), directo a tus audífonos, sin pasar por el limitador del maestro. La toma se graba igual.',
     alcanceT: 'Alcance del micrófono: qué tan lejos escucha', alcTodo: 'Todo el cuarto', alcMedio: 'Medio', alcCerca: 'Solo lo cercano', alcCalibrar: 'Calibrar con mis dedos',
     alcSilencio: 'Paso 1 de 2: silencio total… midiendo el cuarto', alcPrepara: 'Paso 2 de 2: prepárate…', alcToca: 'Paso 2 de 2: toca SUAVE con los dedos cerca del micrófono (4 segundos)',
@@ -1382,6 +1385,9 @@ Clap:    . . . . X . . . . . . . X . . .</div>
     deshecho: 'Undone', rehecho: 'Redone', nadaDeshacer: 'Nothing to undo', cortado: 'Clip split', normalizado: 'Clip normalized ({d} dB)',
     sinEspacio: 'There’s no room to save. Free up space or delete old projects.', errorT: 'Error', clicDerecho: 'Right-click (or long-press) a clip for more options',
     sinSoporte: 'This browser can’t record audio. Use a recent Chrome, Edge or Safari.',
+    directoT: 'Direct mode: zero delay', directoSalir: 'You’re hearing yourself through the app again',
+    directoHtml: `<h3>Done. Now do this:</h3><ol><li><b>Plug your in-ears into your microphone’s headphone output</b> ({m}). On the Blue Yeti it’s underneath, next to the USB cable.</li><li>The app now sends the music through the mic, so you hear <b>the music and your voice together</b> there.</li><li>Your voice comes <b>straight from the mic capsule</b>, without going through the computer: <b>truly zero delay</b>, like the direct monitoring on a pro interface.</li><li>Headphone volume is the <b>mic’s knob</b>. If it’s a Yeti X or has a blend knob, use it to balance your voice and the music.</li></ol><p>The take is still recorded in the app, and latency is compensated automatically (press “Calibrate” in Settings once).</p><p>To hear yourself through the app again: <button type="button" class="boton" id="salirDirecto">Leave direct mode</button></p>`,
+    directoHtmlManual: `<h3>Almost done. Do this:</h3><ol><li><b>Plug your in-ears into your microphone’s headphone output</b> ({m}). On the Blue Yeti it’s underneath, next to the USB cable.</li><li>This browser can’t choose the output here: on a Mac open <b>System Settings → Sound → Output</b> and pick your microphone (e.g. “Yeti Stereo Microphone”), so the app’s music plays through it too.</li><li>Your voice comes <b>straight from the mic</b>, without going through the computer: <b>truly zero delay</b>.</li><li>Headphone volume is the <b>mic’s knob</b>.</li></ol><p>The app stopped sending your voice back (otherwise you’d hear it twice).</p><p>To hear yourself through the app again: <button type="button" class="boton" id="salirDirecto">Leave direct mode</button></p>`,
     buferT: 'Buffer size (like in Pro Tools)', buferMin: 'Minimum', buferNormal: 'Normal', buferSeguro: 'Safe',
     buferNota: 'Now: {ms} ms buffer. Minimum = less delay when hearing yourself. If you hear dropouts or clicks, go up to Normal or Safe.', buferRecarga: 'Changing the buffer: the app reloads…',
     retrasoBien: 'Monitoring delay: <b>{ms} ms</b>. Excellent, barely noticeable.', retrasoMedio: 'Monitoring delay: <b>{ms} ms</b>. You might notice it a little.',
@@ -1390,7 +1396,7 @@ Clap:    . . . . X . . . . . . . X . . .</div>
     retrasoEstimado: '(Estimated: press “Calibrate” in Settings to measure it for real.)',
     retrasoFrecuencia: '<b>Note: your mic runs at {m} kHz and the output at {s} kHz.</b> The browser has to convert, which adds delay. On a Mac open “Audio MIDI Setup” and set both the mic and the headphone output to 48 kHz (48,000 Hz), then reload the app.',
     retrasoBT: 'Monitoring delay: <b>{ms} ms</b>. <b>Your headphones look like Bluetooth</b>: they add 150–250 ms and will never feel instant. Use wired headphones, ideally plugged into the mic.',
-    usarSalidaMic: 'Use my microphone’s headphone output (zero delay)', usarSalidaMicListo: 'Done: plug your headphones into the Yeti (the jack is underneath) and turn up its knob. You hear yourself directly, with no delay. The app no longer sends your voice back.',
+    usarSalidaMic: '⚡ Direct mode: hear myself through the mic (zero delay)', usarSalidaMicListo: 'Done: plug your headphones into the Yeti (the jack is underneath) and turn up its knob. You hear yourself directly, with no delay. The app no longer sends your voice back.',
     rapidaT: 'Fast monitoring (less delay)', rapidaSi: 'Yes: direct', rapidaNo: 'No: with track effects', rapidaNota: 'Fast monitoring lets you hear the input gate, EQ and compressor (all zero-delay) straight to your headphones, skipping the master limiter. The take is recorded the same.',
     alcanceT: 'Mic reach: how far it listens', alcTodo: 'Whole room', alcMedio: 'Medium', alcCerca: 'Only what’s close', alcCalibrar: 'Calibrate with my fingers',
     alcSilencio: 'Step 1 of 2: total silence… measuring the room', alcPrepara: 'Step 2 of 2: get ready…', alcToca: 'Step 2 of 2: tap SOFTLY with your fingers close to the mic (4 seconds)',
@@ -4101,7 +4107,7 @@ function construirEntrada() {
   c3.appendChild(fila);
   c3.insertAdjacentHTML('beforeend', `<div class="e-retraso-caja"><p class="e-retraso" id="entRetraso"></p>
     <button type="button" class="e-chip" id="usarSalidaMic">${t('usarSalidaMic')}</button></div>`);
-  c3.querySelector('#usarSalidaMic').onclick = () => { ponerEscucha('no'); aviso(t('usarSalidaMicListo'), 6000); };
+  c3.querySelector('#usarSalidaMic').onclick = modoDirecto;
   c3.insertAdjacentHTML('beforeend', `<p class="e-ent-titulo">${t('entGrabarCon')}</p>
     <div class="seg e-seg" id="entEfectos"><button type="button" data-v="si">${t('entConEfectos')}</button><button type="button" data-v="no">${t('entSinEfectos')}</button></div>
     <p class="e-ent-nota">${t('entNotaRev')}</p>`);
@@ -4845,10 +4851,45 @@ async function crearEjemploTechno() {
 }
 
 /* ---------- Guía: cómo se hace un hard techno ---------- */
-function abrirGuia() {
-  $('guiaCuerpo').innerHTML = t('guiaHtml');
-  $('dlgGuia').showModal();
+function abrirInfo(titulo, html) {
+  $('dlgGuia').querySelector('h2').textContent = titulo;
+  $('guiaCuerpo').innerHTML = html;
+  if (!$('dlgGuia').open) $('dlgGuia').showModal();
 }
+function abrirGuia() { abrirInfo(t('guiaT'), t('guiaHtml')); }
+
+/* ---------- Modo directo: tu voz por el micrófono (cero retraso) y la música de la app también por él ----------
+ * El micrófono USB (Blue Yeti y parecidos) tiene salida de audífonos que te devuelve tu voz sin pasar por la computadora.
+ * La app manda la música a esa misma salida y deja de devolverte la voz (si no, la oirías dos veces). */
+async function modoDirecto() {
+  try { await prepararMic(); } catch (e) { aviso(t('micSinPermiso')); return; }
+  const pista = mic.stream.getAudioTracks()[0], aj = pista.getSettings ? pista.getSettings() : {};
+  let salida = null;
+  try {
+    const sal = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === 'audiooutput' && d.deviceId !== 'default');
+    // La salida del mismo aparato que el micrófono (mismo groupId), o una que se llame parecido
+    salida = sal.find((d) => aj.groupId && d.groupId === aj.groupId)
+      || sal.find((d) => /yeti|blue|at2020|rode|shure|focusrite|scarlett|interfa/i.test(d.label) && pista.label && d.label.split(' ')[0] === pista.label.split(' ')[0]);
+  } catch (e) {}
+  let cambiada = false;
+  if (salida && sePuedeElegirSalida) {
+    guardarPref('salidaId', salida.deviceId);
+    await aplicarSalida();
+    cambiada = true;
+  }
+  ponerEscucha('no');
+  guardarPref('modoDirecto', true);
+  const nombre = salida ? salida.label.replace(/\s*\([0-9a-f]{4}:[0-9a-f]{4}\)/i, '') : (pista.label || t('micT'));
+  abrirInfo(t('directoT'), t(cambiada ? 'directoHtml' : 'directoHtmlManual', { m: esc(nombre) }));
+}
+function salirModoDirecto() {
+  guardarPref('salidaId', ''); aplicarSalida();
+  guardarPref('modoDirecto', false);
+  ponerEscucha(leerPref('escuchaUltimo', 'auto'));
+  if ($('dlgGuia').open) $('dlgGuia').close();
+  aviso(t('directoSalir'), 3500);
+}
+document.addEventListener('click', (e) => { if (e.target && e.target.id === 'salirDirecto') salirModoDirecto(); });
 $('cerrarGuia').onclick = () => $('dlgGuia').close();
 $('dlgGuia').addEventListener('click', (e) => { if (e.target === $('dlgGuia')) $('dlgGuia').close(); });
 $('ejemploInicio').onclick = () => crearEjemploTechno().catch((e) => aviso(e.message));
